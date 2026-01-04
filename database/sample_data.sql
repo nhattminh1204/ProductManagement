@@ -24,19 +24,19 @@ INSERT INTO categories (name, status) VALUES
 -- =====================================================
 
 -- Password mặc định: "password123" (đã mã hóa BCrypt)
-INSERT INTO users (name, email, phone, password, role, status) VALUES
-('Admin System', 'admin@husc.edu.vn', '0123456789', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin', 'active'),
-('Nguyễn Văn An', 'nguyenvana@gmail.com', '0987654321', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user', 'active'),
-('Trần Thị Bình', 'tranthib@gmail.com', '0912345678', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user', 'active'),
-('Lê Văn Cường', 'levanc@gmail.com', '0909123456', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user', 'active'),
-('Phạm Thị Dung', 'phamthid@gmail.com', '0898765432', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user', 'active');
+INSERT INTO users (name, username, email, phone, address, password, role, status) VALUES
+('Admin System', 'admin', 'admin@husc.edu.vn', '0123456789', '77 Nguyen Hue, Hue City', '$2a$12$5GuPJJvrr9YGSrq6ofEuxODfgsW5MyF6BTzITvf3bbv4lJD7Y3M8.', 'admin', 'active'),
+('Nguyễn Văn An', 'nguyenvana', 'nguyenvana@gmail.com', '0987654321', '123 Đường Lê Lợi, Quận 1, TP.HCM', '$2a$12$5GuPJJvrr9YGSrq6ofEuxODfgsW5MyF6BTzITvf3bbv4lJD7Y3M8.', 'user', 'active'),
+('Trần Thị Bình', 'tranthib', 'tranthib@gmail.com', '0912345678', '456 Đường Trần Hưng Đạo, Quận 5, TP.HCM', '$2a$12$5GuPJJvrr9YGSrq6ofEuxODfgsW5MyF6BTzITvf3bbv4lJD7Y3M8.', 'user', 'active'),
+('Lê Văn Cường', 'levanc', 'levanc@gmail.com', '0909123456', '789 Đường Nguyễn Huệ, Quận 1, TP.HCM', '$2a$12$5GuPJJvrr9YGSrq6ofEuxODfgsW5MyF6BTzITvf3bbv4lJD7Y3M8.', 'user', 'active'),
+('Phạm Thị Dung', 'phamthid', 'phamthid@gmail.com', '0898765432', '321 Đường Hai Bà Trưng, Quận 3, TP.HCM', '$2a$12$5GuPJJvrr9YGSrq6ofEuxODfgsW5MyF6BTzITvf3bbv4lJD7Y3M8.', 'user', 'active');
 
 -- =====================================================
 -- 3. PRODUCTS (Sản phẩm điện tử)
 -- =====================================================
 
 -- ĐIỆN THOẠI (Category ID: 1)
-INSERT INTO products (name, image, price, quantity, status, id_category) VALUES
+INSERT INTO products (name, image, price, quantity, status, category_id) VALUES
 ('iPhone 15 Pro Max 256GB', 'https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-max-blue-thumbnew-600x600.jpg', 29990000.00, 50, 'active', 1),
 ('iPhone 15 Pro 128GB', 'https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-blue-thumbnew-600x600.jpg', 24990000.00, 45, 'active', 1),
 ('Samsung Galaxy S24 Ultra', 'https://cdn.tgdd.vn/Products/Images/42/307174/samsung-galaxy-s24-ultra-grey-thumbnew-600x600.jpg', 27990000.00, 40, 'active', 1),
@@ -173,6 +173,35 @@ INSERT INTO product_ratings (product_id, user_id, rating, comment) VALUES
 (23, 5, 4, 'Đeo lâu hơi nóng tai nhưng chất lượng tốt.');
 
 -- =====================================================
+-- 8. WISHLISTS (Danh sách yêu thích)
+-- =====================================================
+
+INSERT INTO wishlists (user_id, product_id) VALUES
+(2, 1),
+(2, 10),
+(3, 5),
+(4, 16);
+
+-- =====================================================
+-- 9. CART ITEMS (Giỏ hàng)
+-- =====================================================
+
+INSERT INTO cart_items (user_id, product_id, quantity) VALUES
+(2, 22, 1),
+(3, 3, 2);
+
+-- =====================================================
+-- 10. INVENTORY LOGS (Lịch sử kho hàng)
+-- =====================================================
+
+INSERT INTO inventory_logs (product_id, change_quantity, log_type, notes) VALUES
+(1, 50, 'import', 'Nhập hàng ban đầu'),
+(2, 45, 'import', 'Nhập hàng ban đầu'),
+(3, 40, 'import', 'Nhập hàng ban đầu'),
+(1, -1, 'export', 'Xuất kho đơn hàng ORD-20251224-001'),
+(10, -1, 'export', 'Xuất kho đơn hàng ORD-20251224-001');
+
+-- =====================================================
 -- HOÀN TẤT
 -- =====================================================
 
@@ -189,4 +218,10 @@ SELECT 'Order Details', COUNT(*) FROM order_details
 UNION ALL
 SELECT 'Payments', COUNT(*) FROM payments
 UNION ALL
-SELECT 'Product Ratings', COUNT(*) FROM product_ratings;
+SELECT 'Product Ratings', COUNT(*) FROM product_ratings
+UNION ALL
+SELECT 'Wishlists', COUNT(*) FROM wishlists
+UNION ALL
+SELECT 'Cart Items', COUNT(*) FROM cart_items
+UNION ALL
+SELECT 'Inventory Logs', COUNT(*) FROM inventory_logs;
