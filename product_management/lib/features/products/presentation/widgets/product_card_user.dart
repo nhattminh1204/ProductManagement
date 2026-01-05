@@ -3,13 +3,28 @@ import 'package:provider/provider.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../wishlist/presentation/providers/wishlist_provider.dart';
 import '../../../shared/design_system.dart';
+import '../../../shared/widgets/love_button.dart';
 import '../screens/product_detail_screen.dart';
 
-class ProductCardUser extends StatelessWidget {
+class ProductCardUser extends StatefulWidget {
   final Product product;
+  final Function(GlobalKey)? onAddToCart;
 
-  const ProductCardUser({super.key, required this.product});
+  const ProductCardUser({
+    super.key,
+    required this.product,
+    this.onAddToCart,
+  });
+
+  @override
+  State<ProductCardUser> createState() => _ProductCardUserState();
+}
+
+class _ProductCardUserState extends State<ProductCardUser> {
+  final GlobalKey _imageKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +32,7 @@ class ProductCardUser extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
+          MaterialPageRoute(builder: (_) => ProductDetailScreen(product: widget.product)),
         );
       },
       child: Container(
@@ -37,34 +52,106 @@ class ProductCardUser extends StatelessWidget {
           children: [
             // Image Section
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: product.image != null && product.image!.isNotEmpty
-                    ? Image.network(
-                        product.image!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            color: Colors.grey[100],
-                            child: Center(
-                              child: Icon(Icons.image_not_supported_rounded,
-                                  color: Colors.grey[300], size: 40),
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: Colors.grey[100],
-                        child: Center(
-                          child: Icon(Icons.inventory_2_rounded,
-                              color: Colors.grey[300], size: 40),
-                        ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Container(
+                        key: _imageKey,
+                        child: widget.product.image != null && widget.product.image!.isNotEmpty
+                            ? Image.network(
+                                widget.product.image!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    color: Colors.grey[100],
+                                    child: Center(
+                                      child: Icon(Icons.image_not_supported_rounded,
+                                          color: Colors.grey[300], size: 40),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                color: Colors.grey[100],
+                                child: Center(
+                                  child: Icon(Icons.inventory_2_rounded,
+                                      color: Colors.grey[300], size: 40),
+                                ),
+                              ),
                       ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Consumer2<WishlistProvider, AuthProvider>(
+                      builder: (context, wishlistProvider, authProvider, child) {
+                        final isWishlisted = wishlistProvider.isInWishlist(widget.product.id);
+                        return Container(
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Center(
+                            child: LoveButton(
+                              isLiked: isWishlisted,
+                              size: 18,
+                              onTap: () async {
+                                if (!authProvider.isAuthenticated || authProvider.userId == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                          'Vui lòng đăng nhập để thêm vào danh sách yêu thích'),
+                                      backgroundColor: AppColors.error,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)),
+                                      width: 300,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                try {
+                                  if (isWishlisted) {
+                                    await wishlistProvider.removeFromWishlist(
+                                        authProvider.userId!, widget.product.id);
+                                  } else {
+                                    await wishlistProvider.addToWishlist(
+                                        authProvider.userId!, widget.product.id);
+                                  }
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Lỗi: ${e.toString()}'),
+                                      backgroundColor: AppColors.error,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             // Content Section - Fixed height
@@ -77,7 +164,7 @@ class ProductCardUser extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      product.name,
+                      widget.product.name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
@@ -91,14 +178,14 @@ class ProductCardUser extends StatelessWidget {
                   // Rating Row - Always reserve space (fixed height)
                   SizedBox(
                     height: 16,
-                    child: product.averageRating != null && product.averageRating! > 0
+                    child: widget.product.averageRating != null && widget.product.averageRating! > 0
                         ? Row(
                             children: [
                               const Icon(Icons.star_rounded,
                                   color: Colors.amber, size: 14),
                               const SizedBox(width: 4),
                               Text(
-                                product.averageRating!.toStringAsFixed(1),
+                                widget.product.averageRating!.toStringAsFixed(1),
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -107,7 +194,7 @@ class ProductCardUser extends StatelessWidget {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                '(${product.totalRatings ?? 0})',
+                                '(${widget.product.totalRatings ?? 0})',
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: Colors.grey[400],
@@ -135,7 +222,7 @@ class ProductCardUser extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        product.price.formatPriceWithCurrency(),
+                        widget.product.price.formatPriceWithCurrency(),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -161,18 +248,22 @@ class ProductCardUser extends StatelessWidget {
                           icon: const Icon(Icons.shopping_cart_outlined,
                               size: 16, color: Colors.white),
                           onPressed: () {
-                            context.read<CartProvider>().addToCart(product);
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${product.name} added to cart'),
-                                backgroundColor: AppColors.textMain,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                width: 200,
-                              ),
-                            );
+                            if (widget.onAddToCart != null) {
+                              widget.onAddToCart!(_imageKey);
+                            } else {
+                              context.read<CartProvider>().addToCart(widget.product);
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${widget.product.name} added to cart'),
+                                  backgroundColor: AppColors.textMain,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  width: 200,
+                                ),
+                              );
+                            }
                           },
                         ),
                       ),
@@ -187,4 +278,3 @@ class ProductCardUser extends StatelessWidget {
     );
   }
 }
-

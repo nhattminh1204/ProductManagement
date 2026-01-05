@@ -34,4 +34,6 @@ public class UserDTO {
     private String role;
 
     private String status;
+
+    private java.time.LocalDateTime createdAt;
 }

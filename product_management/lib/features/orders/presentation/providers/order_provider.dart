@@ -5,6 +5,8 @@ import '../../domain/usecases/get_orders_usecase.dart';
 import '../../domain/usecases/get_order_by_id_usecase.dart';
 import '../../domain/usecases/get_order_by_code_usecase.dart';
 import '../../domain/usecases/get_orders_by_email_usecase.dart';
+import '../../domain/usecases/get_orders_by_user_id_usecase.dart';
+import '../../domain/usecases/get_orders_by_status_usecase.dart';
 import '../../domain/usecases/create_order_usecase.dart';
 import '../../domain/usecases/update_order_status_usecase.dart';
 import '../../domain/usecases/cancel_order_usecase.dart';
@@ -15,6 +17,8 @@ class OrderProvider extends ChangeNotifier {
   final GetOrderByIdUseCase _getOrderByIdUseCase;
   final GetOrderByCodeUseCase _getOrderByCodeUseCase;
   final GetOrdersByEmailUseCase _getOrdersByEmailUseCase;
+  final GetOrdersByUserIdUseCase _getOrdersByUserIdUseCase;
+  final GetOrdersByStatusUseCase _getOrdersByStatusUseCase;
   final UpdateOrderStatusUseCase _updateOrderStatusUseCase;
   final CreateOrderUseCase _createOrderUseCase;
   final CancelOrderUseCase _cancelOrderUseCase;
@@ -24,17 +28,21 @@ class OrderProvider extends ChangeNotifier {
     this._getOrderByIdUseCase,
     this._getOrderByCodeUseCase,
     this._getOrdersByEmailUseCase,
+    this._getOrdersByUserIdUseCase,
+    this._getOrdersByStatusUseCase,
     this._updateOrderStatusUseCase,
     this._createOrderUseCase,
     this._cancelOrderUseCase,
   );
 
   List<Order> _orders = [];
+  List<Order> _userOrders = [];
   Order? _selectedOrder;
   bool _isLoading = false;
   String? _errorMessage;
 
   List<Order> get orders => _orders;
+  List<Order> get userOrders => _userOrders;
   Order? get selectedOrder => _selectedOrder;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -74,6 +82,22 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchOrderById(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _selectedOrder = await _getOrderByIdUseCase(id);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
   Future<Order?> getOrderByCode(String code) async {
     _isLoading = true;
     _errorMessage = null;
@@ -109,6 +133,40 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchOrdersByUserId(int userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _userOrders = await _getOrdersByUserIdUseCase(userId);
+      _userOrders.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchOrdersByStatus(String status) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _orders = await _getOrdersByStatusUseCase(status);
+      _orders.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
   Future<bool> updateOrderStatus(int id, String status) async {
     _isLoading = true;
     _errorMessage = null;
@@ -129,6 +187,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   Future<bool> createOrder({
+    int? userId,
     required String customerName,
     required String email,
     required String phone,
@@ -156,6 +215,7 @@ class OrderProvider extends ChangeNotifier {
         email: email,
         phone: phone,
         address: address,
+        userId: userId,
         paymentMethod: paymentMethod,
         totalPrice: cartItems.fold(0, (sum, item) => sum + item.totalPrice),
         status: 'pending',

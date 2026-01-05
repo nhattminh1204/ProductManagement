@@ -35,8 +35,10 @@ class UserRepositoryImpl implements UserRepository {
     return User(
       id: model.id,
       name: model.name,
+      username: model.username,
       email: model.email,
       phone: model.phone,
+      address: model.address,
       role: model.role,
       status: model.status,
     );
@@ -46,8 +48,10 @@ class UserRepositoryImpl implements UserRepository {
     return UserModel(
       id: entity.id,
       name: entity.name,
+      username: entity.username,
       email: entity.email,
       phone: entity.phone,
+      address: entity.address,
       role: entity.role,
       status: entity.status,
     );

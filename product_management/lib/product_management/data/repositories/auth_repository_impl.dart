@@ -6,12 +6,12 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._apiService);
 
   @override
-  Future<String> login(String email, String password) {
-    return _apiService.login(email, password);
+  Future<String> login(String usernameOrEmail, String password) {
+    return _apiService.login(usernameOrEmail, password);
   }
 
   @override
-  Future<void> register(String name, String email, String phone, String password) {
-    return _apiService.register(name, email, phone, password);
+  Future<void> register(String name, String username, String email, String phone, String password) {
+    return _apiService.register(name, username, email, phone, password);
   }
 }

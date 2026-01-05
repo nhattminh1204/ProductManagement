@@ -1,9 +1,11 @@
 package com.husc.productmanagement.service;
 
 import com.husc.productmanagement.dto.WishlistDTO;
+import com.husc.productmanagement.dto.ProductDTO;
 import com.husc.productmanagement.entity.Product;
 import com.husc.productmanagement.entity.User;
 import com.husc.productmanagement.entity.Wishlist;
+import com.husc.productmanagement.entity.ProductRating;
 import com.husc.productmanagement.repository.ProductRepository;
 import com.husc.productmanagement.repository.UserRepository;
 import com.husc.productmanagement.repository.WishlistRepository;
@@ -60,9 +62,35 @@ public class WishlistService {
         dto.setId(wishlist.getId());
         dto.setUserId(wishlist.getUser().getId());
         dto.setProductId(wishlist.getProduct().getId());
-        dto.setProductName(wishlist.getProduct().getName());
-        dto.setProductImage(wishlist.getProduct().getImage());
-        dto.setProductPrice(wishlist.getProduct().getPrice());
+
+        Product product = wishlist.getProduct();
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setImage(product.getImage());
+        productDTO.setPrice(product.getPrice());
+        productDTO.setDiscountPrice(product.getDiscountPrice());
+        productDTO.setQuantity(product.getQuantity());
+        productDTO.setStatus(product.getStatus().getValue());
+        if (product.getCategory() != null) {
+            productDTO.setCategoryId(product.getCategory().getId());
+            productDTO.setCategoryName(product.getCategory().getName());
+        }
+
+        if (product.getRatings() != null && !product.getRatings().isEmpty()) {
+            double average = product.getRatings().stream()
+                    .mapToInt(rating -> rating.getRating())
+                    .average()
+                    .orElse(0.0);
+            productDTO.setAverageRating(average);
+            productDTO.setTotalRatings((long) product.getRatings().size());
+        } else {
+            productDTO.setAverageRating(0.0);
+            productDTO.setTotalRatings(0L);
+        }
+
+        dto.setProduct(productDTO);
         dto.setCreatedAt(wishlist.getCreatedAt());
         return dto;
     }

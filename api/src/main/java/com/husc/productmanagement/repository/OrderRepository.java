@@ -17,4 +17,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByEmail(String email);
 
     List<Order> findByCustomerNameContaining(String customerName);
+
+    List<Order> findByUserId(Integer userId);
 }

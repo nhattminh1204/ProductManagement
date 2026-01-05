@@ -5,6 +5,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../providers/order_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../shared/design_system.dart';
+import 'order_detail_screen.dart';
 
 class UserOrderHistoryScreen extends StatefulWidget {
   const UserOrderHistoryScreen({super.key});
@@ -41,11 +42,16 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('My Orders')),
+      appBar: AppBar(
+        title: const Text('Đơn hàng của tôi'),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+      ),
       body: orderProvider.isLoading
         ? const Center(child: CircularProgressIndicator())
         : orderProvider.errorMessage != null
-          ? Center(child: Text('Error: ${orderProvider.errorMessage}'))
+          ? Center(child: Text('Lỗi: ${orderProvider.errorMessage}'))
           : orderProvider.orders.isEmpty
             ? Center(
                 child: Column(
@@ -53,7 +59,7 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                   children: [
                     Icon(Icons.history_rounded, size: 80, color: Colors.grey[300]),
                     const SizedBox(height: 16),
-                    Text('No orders yet', style: TextStyle(color: Colors.grey[600], fontSize: 18)),
+                    Text('Chưa có đơn hàng nào', style: TextStyle(color: Colors.grey[600], fontSize: 18)),
                   ],
                 ),
               )
@@ -82,14 +88,23 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                           ),
                         ],
                       ),
-                      child: ExpansionTile(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        backgroundColor: Colors.white,
-                        collapsedBackgroundColor: Colors.white,
-                        title: Row(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OrderDetailScreen(orderId: order.id),
+                            ),
+                          );
+                        },
+                        child: ExpansionTile(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          backgroundColor: Colors.white,
+                          collapsedBackgroundColor: Colors.white,
+                          title: Row(
                           children: [
                             Text(
-                              order.orderCode.isNotEmpty ? '#${order.orderCode} ' : '#${order.id} ',
+                              order.orderCode.isNotEmpty ? '#${order.orderCode} ' : 'Đơn hàng #${order.id} ',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -114,7 +129,7 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                           children: [
                             const SizedBox(height: 4),
                             Text(
-                              DateFormat('MMM dd, yyyy HH:mm').format(order.createdDate),
+                              DateFormat('dd/MM/yyyy HH:mm').format(order.createdDate),
                               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                             ),
                             const SizedBox(height: 4),
@@ -135,7 +150,7 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Items:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const Text('Sản phẩm:', style: TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
                                 ...order.items.map((item) => Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
@@ -164,7 +179,7 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                                 const SizedBox(height: 12),
                                 const Divider(),
                                 const SizedBox(height: 8),
-                                const Text('Delivery to:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const Text('Giao tới:', style: TextStyle(fontWeight: FontWeight.bold)),
                                 Text(order.customerName),
                                 if (order.address != null) Text(order.address!),
                                 if (order.phone != null) Text(order.phone!),
@@ -173,10 +188,11 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
+            ),
     );
   }
 }

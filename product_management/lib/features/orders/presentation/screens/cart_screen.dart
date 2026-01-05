@@ -6,7 +6,9 @@ import '../../../shared/design_system.dart';
 import 'checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
-  const CartScreen({super.key});
+  final VoidCallback? onGoShopping;
+
+  const CartScreen({super.key, this.onGoShopping});
 
   @override
   Widget build(BuildContext context) {
@@ -15,16 +17,53 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Shopping Cart'),
+        title: const Text('Giỏ hàng'),
+        centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textMain,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.menu_rounded),
-        //   onPressed: () {
-        //     // Scaffold.of(context).openDrawer(); 
-        //   },
-        // ),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else if (onGoShopping != null) {
+              onGoShopping!();
+            }
+          },
+        ),
+        actions: [
+          if (cartProvider.items.isNotEmpty)
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Xóa giỏ hàng'),
+                    content: const Text(
+                        'Bạn có chắc chắn muốn xóa tất cả sản phẩm khỏi giỏ hàng?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('Hủy'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.read<CartProvider>().clearCart();
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('Xóa',
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: const Icon(Icons.delete_sweep_outlined, color: Colors.white),
+            ),
+        ],
       ),
       body: cartProvider.isEmpty
           ? Center(
@@ -33,13 +72,21 @@ class CartScreen extends StatelessWidget {
                 children: [
                    Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[300]),
                    const SizedBox(height: 16),
-                   Text('Your cart is empty', style: TextStyle(fontSize: 18, color: Colors.grey[600])),
+                   Text('Giỏ hàng trống', style: TextStyle(fontSize: 18, color: Colors.grey[600])),
                    const SizedBox(height: 8),
                    ElevatedButton(
                      onPressed: () {
-                       // Navigate back to home/products
+                       if (onGoShopping != null) {
+                         onGoShopping!();
+                       } else if (Navigator.canPop(context)) {
+                         Navigator.pop(context);
+                       } else {
+                         // Default fallback if we can't pop and no callback provided
+                         // You might want to navigate to a specific route here
+                         Navigator.of(context).popUntil((route) => route.isFirst);
+                       }
                      }, 
-                     child: const Text('Go Shopping'),
+                     child: const Text('Mua sắm ngay'),
                    )
                 ],
               ),
@@ -173,7 +220,7 @@ class CartScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Total Amount',
+                              'Tổng tiền',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
@@ -210,7 +257,7 @@ class CartScreen extends StatelessWidget {
                               elevation: 0,
                             ),
                             child: const Text(
-                              'Checkout',
+                              'Thanh toán',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),

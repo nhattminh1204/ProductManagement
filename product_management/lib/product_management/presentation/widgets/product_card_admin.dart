@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:product_management/product_management/domain/entities/entities.dart';
 import 'package:provider/provider.dart';
-import '../providers/product_provider.dart';
-import '../screens/product_form_screen.dart';
+import '../../../features/products/domain/entities/product_entity.dart'
+    as features;
+import '../../../features/products/presentation/providers/product_provider.dart';
+import '../../../features/products/presentation/screens/product_form_screen.dart';
 
 class ProductCardAdmin extends StatelessWidget {
   final Product product;
@@ -43,15 +45,16 @@ class ProductCardAdmin extends StatelessWidget {
               children: [
                 Text(
                   product.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '\$${product.price.toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -89,7 +92,7 @@ class ProductCardAdmin extends StatelessWidget {
           ),
           Divider(height: 1),
           Row(
-             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
@@ -97,17 +100,28 @@ class ProductCardAdmin extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          ProductFormScreen(product: product),
+                      builder: (_) {
+                        // Convert product_management Product to features Product
+                        final featuresProduct = features.Product(
+                          id: product.id,
+                          name: product.name,
+                          image: product.image,
+                          price: product.price,
+                          quantity: product.quantity,
+                          status: product.status,
+                          categoryId: product.categoryId,
+                          categoryName: product.categoryName,
+                          averageRating: product.averageRating,
+                          totalRatings: product.totalRatings,
+                        );
+                        return ProductFormScreen(product: featuresProduct);
+                      },
                     ),
                   );
                 },
               ),
               IconButton(
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.red,
-                ),
+                icon: const Icon(Icons.delete, color: Colors.red),
                 onPressed: () {
                   _showDeleteConfirmDialog(context);
                 },
@@ -124,9 +138,7 @@ class ProductCardAdmin extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Product'),
-        content: Text(
-          'Are you sure you want to delete "${product.name}"?',
-        ),
+        content: Text('Are you sure you want to delete "${product.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -140,14 +152,8 @@ class ProductCardAdmin extends StatelessWidget {
                   .read<ProductProvider>()
                   .deleteProduct(product.id);
               if (success && context.mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Product deleted successfully',
-                    ),
-                  ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Product deleted successfully')),
                 );
               }
             },

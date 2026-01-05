@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:product_management/product_management/presentation/screens/user_order_history_screen.dart';
 import 'package:provider/provider.dart';
+import '../../products/presentation/screens/user_product_list_screen.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
-import '../design_system.dart';
 import '../../auth/presentation/screens/login_screen.dart';
+import '../../orders/presentation/screens/user_order_history_screen.dart';
+import '../../payments/presentation/screens/payment_history_screen.dart';
+import '../design_system.dart';
 
 class AppDrawer extends StatelessWidget {
   final int? currentIndex;
@@ -21,10 +23,10 @@ class AppDrawer extends StatelessWidget {
           // Drawer Header
           UserAccountsDrawerHeader(
             accountName: Text(
-              authProvider.isAdmin ? 'Administrator' : 'Customer',
+              authProvider.isAdmin ? 'Quản trị viên' : 'Khách hàng',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            accountEmail: Text(authProvider.userEmail ?? 'No email'),
+            accountEmail: Text(authProvider.userEmail ?? 'Chưa có email'),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(Icons.person, color: AppColors.primary, size: 40),
@@ -40,26 +42,46 @@ class AppDrawer extends StatelessWidget {
                 _buildDrawerItem(
                   context: context,
                   icon: Icons.home_outlined,
-                  title: 'Home',
+                  title: 'Trang chủ',
                   index: 0,
                 ),
                 _buildDrawerItem(
                   context: context,
+                  icon: Icons.inventory_2_outlined,
+                  title: 'Sản phẩm',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const UserProductListScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDrawerItem(
+                  context: context,
                   icon: Icons.shopping_bag_outlined,
-                  title: 'Cart',
+                  title: 'Giỏ hàng',
                   index: 1,
                 ),
                 _buildDrawerItem(
                   context: context,
-                  icon: Icons.person_outline_rounded,
-                  title: 'Profile',
+                  icon: Icons.favorite_border_rounded,
+                  title: 'Yêu thích',
                   index: 2,
+                ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.person_outline_rounded,
+                  title: 'Hồ sơ cá nhân',
+                  index: 3,
                 ),
                 const Divider(),
                 _buildDrawerItem(
                   context: context,
                   icon: Icons.history_rounded,
-                  title: 'Order History',
+                  title: 'Lịch sử đơn hàng',
                   onTap: () {
                     Navigator.pop(context); // Close drawer
                     Navigator.push(
@@ -70,11 +92,25 @@ class AppDrawer extends StatelessWidget {
                     );
                   },
                 ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.payment,
+                  title: 'Lịch sử thanh toán',
+                  onTap: () {
+                    Navigator.pop(context); // Close drawer
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PaymentHistoryScreen(),
+                      ),
+                    );
+                  },
+                ),
                 const Divider(),
                 _buildDrawerItem(
                   context: context,
                   icon: Icons.logout_rounded,
-                  title: 'Sign Out',
+                  title: 'Đăng xuất',
                   onTap: () {
                     Navigator.pop(context); // Close drawer
                     context.read<AuthProvider>().logout();

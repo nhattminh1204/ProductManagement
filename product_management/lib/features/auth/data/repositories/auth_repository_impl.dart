@@ -11,8 +11,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> register(String name, String email, String phone, String password) {
-    return _apiService.register(name, email, phone, password);
+  Future<void> register(String name, String username, String email, String phone, String password) {
+    return _apiService.register(name, username, email, phone, password);
   }
 }
 

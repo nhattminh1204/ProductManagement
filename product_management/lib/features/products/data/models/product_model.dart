@@ -9,6 +9,7 @@ class ProductModel {
   final String? categoryName;
   final double? averageRating;
   final int? totalRatings;
+  final String? description;
 
   ProductModel({
     required this.id,
@@ -21,6 +22,7 @@ class ProductModel {
     this.categoryName,
     this.averageRating,
     this.totalRatings,
+    this.description,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class ProductModel {
       categoryName: json['categoryName'],
       averageRating: (json['averageRating'] != null) ? (json['averageRating'] as num).toDouble() : null,
       totalRatings: json['totalRatings'],
+      description: json['description'],
     );
   }
 
@@ -48,6 +51,7 @@ class ProductModel {
       'status': status,
       'categoryId': categoryId,
       'categoryName': categoryName,
+      'description': description,
     };
   }
 }

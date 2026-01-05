@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:product_management/product_management/domain/entities/entities.dart';
 import 'package:provider/provider.dart';
 import '../../../core/utils/price_formatter.dart';
-import '../providers/cart_provider.dart';
+import '../../../features/orders/presentation/providers/cart_provider.dart';
+import '../../../features/products/domain/entities/product_entity.dart' as features;
+import '../../../features/products/presentation/screens/product_detail_screen.dart';
 import '../design_system.dart';
-import '../screens/product_detail_screen.dart';
 
 class ProductCardUser extends StatelessWidget {
   final Product product;
@@ -15,9 +16,22 @@ class ProductCardUser extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        // Convert product_management Product to features Product
+        final featuresProduct = features.Product(
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          quantity: product.quantity,
+          status: product.status,
+          categoryId: product.categoryId,
+          categoryName: product.categoryName,
+          averageRating: product.averageRating,
+          totalRatings: product.totalRatings,
+        );
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
+          MaterialPageRoute(builder: (_) => ProductDetailScreen(product: featuresProduct)),
         );
       },
       child: Container(
@@ -164,7 +178,20 @@ class ProductCardUser extends StatelessWidget {
                           icon: const Icon(Icons.shopping_cart_outlined,
                               size: 16, color: Colors.white),
                           onPressed: () {
-                            context.read<CartProvider>().addToCart(product);
+                            // Convert product_management Product to features Product for CartProvider
+                            final featuresProduct = features.Product(
+                              id: product.id,
+                              name: product.name,
+                              image: product.image,
+                              price: product.price,
+                              quantity: product.quantity,
+                              status: product.status,
+                              categoryId: product.categoryId,
+                              categoryName: product.categoryName,
+                              averageRating: product.averageRating,
+                              totalRatings: product.totalRatings,
+                            );
+                            context.read<CartProvider>().addToCart(featuresProduct);
                             ScaffoldMessenger.of(context).hideCurrentSnackBar();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(

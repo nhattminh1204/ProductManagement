@@ -31,10 +31,10 @@ public class Product {
     @Column(length = 500)
     private String image;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "discount_price", precision = 10, scale = 2)
+    @Column(name = "discount_price", precision = 15, scale = 2)
     private BigDecimal discountPrice;
 
     @Column(nullable = false)

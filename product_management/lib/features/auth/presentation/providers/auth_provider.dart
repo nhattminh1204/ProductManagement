@@ -26,6 +26,29 @@ class AuthProvider extends ChangeNotifier {
   bool get isAdmin => _role == UserRole.admin;
   bool get isUser => _role == UserRole.user;
 
+  int? get userId {
+    if (_token == null) return null;
+    final decoded = JwtParser.decode(_token!);
+    
+    // Try different claim keys
+    dynamic id = decoded['id'];
+    id ??= decoded['UserId'];
+    id ??= decoded['userId'];  // Add lowercase userId
+    id ??= decoded['user_id'];
+    
+    // Fallback to 'sub' if it looks like an integer
+    if (id == null && decoded.containsKey('sub')) {
+      final sub = decoded['sub'];
+      if (sub is int || (sub is String && int.tryParse(sub) != null)) {
+        id = sub;
+      }
+    }
+
+    if (id is int) return id;
+    if (id is String) return int.tryParse(id);
+    return null;
+  }
+
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _errorMessage = null;
@@ -45,13 +68,13 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> register(String name, String email, String phone, String password) async {
+  Future<bool> register(String name, String username, String email, String phone, String password) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _registerUseCase(name, email, phone, password);
+      await _registerUseCase(name, username, email, phone, password);
       _isLoading = false;
       notifyListeners();
       return true;

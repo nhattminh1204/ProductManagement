@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:product_management/features/shared/design_system.dart';
 import 'package:provider/provider.dart';
 import '../providers/rating_provider.dart';
-import '../../../shared/design_system.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../auth/presentation/screens/login_screen.dart';
 
 class RatingListScreen extends StatefulWidget {
   final int? productId;
   final int? userId;
 
-  const RatingListScreen({
-    super.key,
-    this.productId,
-    this.userId,
-  });
+  const RatingListScreen({super.key, this.productId, this.userId});
 
   @override
   State<RatingListScreen> createState() => _RatingListScreenState();
@@ -39,16 +33,21 @@ class _RatingListScreenState extends State<RatingListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.productId != null 
-            ? 'Product Ratings' 
-            : widget.userId != null 
-                ? 'My Ratings' 
-                : 'All Ratings'),
+        title: Text(
+          widget.productId != null
+              ? 'Đánh giá sản phẩm'
+              : widget.userId != null
+              ? 'Đánh giá của tôi'
+              : 'Tất cả đánh giá',
+        ),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: ratingProvider.isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ratingProvider.errorMessage != null
-          ? Center(child: Text('Error: ${ratingProvider.errorMessage}'))
+          ? const Center(child: CircularProgressIndicator())
+          : ratingProvider.errorMessage != null
+          ? Center(child: Text('Lỗi: ${ratingProvider.errorMessage}'))
           : ratingProvider.ratings.isEmpty
           ? Center(
               child: Column(
@@ -56,7 +55,7 @@ class _RatingListScreenState extends State<RatingListScreen> {
                 children: [
                   const Icon(Icons.star_border, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
-                  const Text('No ratings found'),
+                  const Text('Chưa có đánh giá nào'),
                 ],
               ),
             )
@@ -66,7 +65,10 @@ class _RatingListScreenState extends State<RatingListScreen> {
               itemBuilder: (context, index) {
                 final rating = ratingProvider.ratings[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -76,7 +78,10 @@ class _RatingListScreenState extends State<RatingListScreen> {
                           children: [
                             CircleAvatar(
                               child: Text(
-                                rating.userName?.substring(0, 1).toUpperCase() ?? 'U',
+                                rating.userName
+                                        ?.substring(0, 1)
+                                        .toUpperCase() ??
+                                    'U',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -85,7 +90,7 @@ class _RatingListScreenState extends State<RatingListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    rating.userName ?? 'Anonymous',
+                                    rating.userName ?? 'Ẩn danh',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -105,8 +110,8 @@ class _RatingListScreenState extends State<RatingListScreen> {
                             Row(
                               children: List.generate(5, (i) {
                                 return Icon(
-                                  i < rating.rating 
-                                      ? Icons.star 
+                                  i < rating.rating
+                                      ? Icons.star
                                       : Icons.star_border,
                                   size: 20,
                                   color: Colors.amber,
@@ -115,7 +120,8 @@ class _RatingListScreenState extends State<RatingListScreen> {
                             ),
                           ],
                         ),
-                        if (rating.comment != null && rating.comment!.isNotEmpty) ...[
+                        if (rating.comment != null &&
+                            rating.comment!.isNotEmpty) ...[
                           const SizedBox(height: 12),
                           Text(
                             rating.comment!,
@@ -143,4 +149,3 @@ class _RatingListScreenState extends State<RatingListScreen> {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
-

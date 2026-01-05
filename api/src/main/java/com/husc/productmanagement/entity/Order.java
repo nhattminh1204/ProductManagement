@@ -37,7 +37,11 @@ public class Order {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private com.husc.productmanagement.entity.User user;
+
+    @Column(name = "total_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(name = "payment_method", nullable = false, length = 50)

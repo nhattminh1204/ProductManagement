@@ -18,9 +18,16 @@ class OrderItemModel {
       productId: json['productId'] ?? 0,
       productName: json['productName'] ?? '',
       productImage: json['productImage'],
-      price: (json['price'] ?? 0).toDouble(),
+      price: _parseDouble(json['price']) ?? 0.0,
       quantity: json['quantity'] ?? 0,
     );
+  }
+
+  static double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 
   Map<String, dynamic> toJson() {

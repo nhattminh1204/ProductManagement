@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     // Welcome Text
                     Text(
-                      'Welcome Back',
+                      'Chào mừng trở lại',
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Sign in to manage your inventory',
+                      'Đăng nhập để tiếp tục',
                       style: Theme.of(
                         context,
                       ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
@@ -206,15 +206,12 @@ class _LoginScreenState extends State<LoginScreen>
                           children: [
                             _buildTextField(
                               controller: _emailController,
-                              label: 'Email Address',
-                              icon: Icons.email_rounded,
-                              inputType: TextInputType.emailAddress,
+                              label: 'Tên đăng nhập hoặc Email',
+                              icon: Icons.person_rounded,
+                              inputType: TextInputType.text,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Email is required';
-                                }
-                                if (!value.contains('@')) {
-                                  return 'Please enter a valid email';
+                                  return 'Vui lòng nhập tên đăng nhập hoặc email';
                                 }
                                 return null;
                               },
@@ -222,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen>
                             const SizedBox(height: 20),
                             _buildTextField(
                               controller: _passwordController,
-                              label: 'Password',
+                              label: 'Mật khẩu',
                               icon: Icons.lock_rounded,
                               isPassword: true,
                               obscureText: _obscurePassword,
@@ -233,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen>
                               },
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Password is required';
+                                  return 'Vui lòng nhập mật khẩu';
                                 }
                                 return null;
                               },
@@ -269,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             ),
                                           )
                                         : const Text(
-                                            'Sign In',
+                                            'Đăng nhập',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -291,12 +288,12 @@ class _LoginScreenState extends State<LoginScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don\'t have an account? ',
+                          'Chưa có tài khoản? ',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                         TextButton(
                           child: const Text(
-                            'Sign Up',
+                            'Đăng ký',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,

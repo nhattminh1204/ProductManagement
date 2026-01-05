@@ -215,15 +215,65 @@
 - **Endpoint**: `/api/products/{id}`
 - **Response**: `200 OK`
 
+### 3.9. Lấy sản phẩm nổi bật
+- **Method**: `GET`
+- **Endpoint**: `/api/products/featured`
+- **Response**: `200 OK`
+- Returns products with rating >= 4.0
+
+### 3.10. Lấy sản phẩm sắp hết hàng
+- **Method**: `GET`
+- **Endpoint**: `/api/products/low-stock`
+- **Response**: `200 OK`
+- Returns products with quantity <= 10
+
 ---
 
 ## 🛒 4. Orders API (`/api/orders`)
 
-*(No changes to existing Order endpoints)*
-
 ### 4.1. Lấy tất cả đơn hàng
 - **Method**: `GET`
 - **Endpoint**: `/api/orders`
+- **Response**: `200 OK`
+
+### 4.2. Lấy đơn hàng theo ID
+- **Method**: `GET`
+- **Endpoint**: `/api/orders/{id}`
+- **Response**: `200 OK`
+
+### 4.3. Lấy đơn hàng theo mã đơn
+- **Method**: `GET`
+- **Endpoint**: `/api/orders/code/{orderCode}`
+- **Response**: `200 OK`
+
+### 4.4. Lấy đơn hàng theo email
+- **Method**: `GET`
+- **Endpoint**: `/api/orders/customer/{email}`
+- **Response**: `200 OK`
+
+### 4.5. Lấy đơn hàng theo User ID
+- **Method**: `GET`
+- **Endpoint**: `/api/orders/user/{userId}`
+- **Response**: `200 OK`
+
+### 4.6. Lấy đơn hàng theo trạng thái
+- **Method**: `GET`
+- **Endpoint**: `/api/orders/status/{status}`
+- **Response**: `200 OK`
+
+### 4.7. Tạo đơn hàng mới
+- **Method**: `POST`
+- **Endpoint**: `/api/orders`
+- **Response**: `201 Created`
+
+### 4.8. Cập nhật trạng thái đơn hàng
+- **Method**: `PATCH`
+- **Endpoint**: `/api/orders/{id}/status?status={status}`
+- **Response**: `200 OK`
+
+### 4.9. Hủy đơn hàng
+- **Method**: `DELETE`
+- **Endpoint**: `/api/orders/{id}/cancel`
 - **Response**: `200 OK`
 
 ---
@@ -336,18 +386,91 @@
 
 ---
 
+---
+
+## 💳 9. Payments API (`/api/payments`)
+
+### 9.1. Create Payment
+- **Method**: `POST`
+- **Endpoint**: `/api/payments`
+- **Body**:
+```json
+{
+  "orderId": 1,
+  "amount": 999.99,
+  "paymentMethod": "credit_card",
+  "status": "pending"
+}
+```
+- **Response**: `201 Created`
+
+### 9.2. Get Payment By ID
+- **Method**: `GET`
+- **Endpoint**: `/api/payments/{id}`
+- **Response**: `200 OK`
+
+### 9.3. Get Payments By Order
+- **Method**: `GET`
+- **Endpoint**: `/api/payments/order/{orderId}`
+- **Response**: `200 OK`
+
+### 9.4. Get Payments By User
+- **Method**: `GET`
+- **Endpoint**: `/api/payments/user/{userId}`
+- **Response**: `200 OK`
+
+### 9.5. Get All Payments
+- **Method**: `GET`
+- **Endpoint**: `/api/payments`
+- **Response**: `200 OK`
+
+### 9.6. Update Payment Status
+- **Method**: `PATCH`
+- **Endpoint**: `/api/payments/{id}/status?status=paid`
+- **Response**: `200 OK`
+
+---
+
+## 📊 10. Dashboard API (`/api/dashboard`)
+
+### 10.1. Get Dashboard Stats
+- **Method**: `GET`
+- **Endpoint**: `/api/dashboard/stats`
+- **Response**: `200 OK`
+- Returns: totalOrders, totalRevenue, totalProducts, totalUsers, recentOrders, topProducts, orderStatsByStatus
+
+### 10.2. Get Revenue By Period
+- **Method**: `GET`
+- **Endpoint**: `/api/dashboard/revenue?period={period}`
+- **Query Parameters**: period (daily, weekly, monthly, yearly)
+- **Response**: `200 OK`
+
+### 10.3. Get Top Products
+- **Method**: `GET`
+- **Endpoint**: `/api/dashboard/top-products?limit={limit}`
+- **Response**: `200 OK`
+
+### 10.4. Get Order Stats By Status
+- **Method**: `GET`
+- **Endpoint**: `/api/dashboard/order-stats`
+- **Response**: `200 OK`
+
+---
+
 ## 📊 Summary
 
 | Module | Endpoints |
 |--------|-----------|
 | Authentication | 2 |
 | Categories | 6 |
-| Products | 8 |
-| Orders | 7 |
+| Products | 10 |
+| Orders | 9 |
 | Users | 4 |
 | Ratings | 4 |
-| **Wishlist** | **3** |
-| **Cart** | **5** |
-| **Inventory** | **3** |
-| **TOTAL** | **42 endpoints** |
+| Wishlist | 3 |
+| Cart | 5 |
+| Inventory | 3 |
+| **Payments** | **6** |
+| **Dashboard** | **4** |
+| **TOTAL** | **56 endpoints** |
 

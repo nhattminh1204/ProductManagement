@@ -47,6 +47,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
       final user = User(
         id: widget.user?.id ?? 0,
         name: _nameController.text.trim(),
+        username: widget.user?.username ?? _emailController.text.trim().split('@')[0],
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
         role: _role,
@@ -58,7 +59,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('User updated successfully'),
+            content: Text('Cập nhật người dùng thành công'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -71,7 +72,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit User'),
+        title: const Text('Sửa người dùng'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -83,13 +86,13 @@ class _UserFormScreenState extends State<UserFormScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'Tên',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Name is required';
+                    return 'Vui lòng nhập tên';
                   }
                   return null;
                 },
@@ -105,7 +108,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 enabled: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email is required';
+                    return 'Vui lòng nhập Email';
                   }
                   return null;
                 },
@@ -114,7 +117,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               TextFormField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
-                  labelText: 'Phone',
+                  labelText: 'Số điện thoại',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.phone),
                 ),
@@ -122,7 +125,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Role',
+                'Vai trò',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -130,12 +133,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 segments: const [
                   ButtonSegment(
                     value: 'user',
-                    label: Text('User'),
+                    label: Text('Người dùng'),
                     icon: Icon(Icons.person),
                   ),
                   ButtonSegment(
                     value: 'admin',
-                    label: Text('Admin'),
+                    label: Text('Quản trị viên'),
                     icon: Icon(Icons.admin_panel_settings),
                   ),
                 ],
@@ -148,7 +151,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Status',
+                'Trạng thái',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -156,12 +159,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 segments: const [
                   ButtonSegment(
                     value: 'active',
-                    label: Text('Active'),
+                    label: Text('Hoạt động'),
                     icon: Icon(Icons.check_circle),
                   ),
                   ButtonSegment(
                     value: 'inactive',
-                    label: Text('Inactive'),
+                    label: Text('Bị khóa'),
                     icon: Icon(Icons.cancel),
                   ),
                 ],
@@ -188,7 +191,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text(
-                            'Update User',
+                            'Cập nhật',
                             style: TextStyle(fontSize: 16),
                           ),
                   );
@@ -201,5 +204,3 @@ class _UserFormScreenState extends State<UserFormScreen> {
     );
   }
 }
-
-

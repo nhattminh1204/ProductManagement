@@ -1,9 +1,14 @@
 import 'package:dio/dio.dart';
+import 'package:product_management/features/dashboard/data/models/dashboard_stats_model.dart';
 import '../features/products/data/models/product_model.dart';
 import '../features/categories/data/models/category_model.dart';
 import '../features/orders/data/models/order_model.dart';
 import '../features/users/data/models/user_model.dart';
 import '../features/ratings/data/models/rating_model.dart';
+import '../product_management/data/models/cart_item_model.dart';
+import '../features/wishlist/data/models/wishlist_model.dart';
+import '../features/inventory/data/models/inventory_log_model.dart';
+import '../features/payments/data/models/payment_model.dart';
 
 import '../core/config/app_config.dart';
 
@@ -46,7 +51,7 @@ class ApiService {
   }
 
   String _parseError(DioException e) {
-    if (e.type == DioExceptionType.connectionTimeout || 
+    if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return 'Connection timeout. Please check your internet.';
     }
@@ -69,11 +74,11 @@ class ApiService {
   }
 
   // --- Auth ---
-  Future<String> login(String email, String password) async {
+  Future<String> login(String usernameOrEmail, String password) async {
     try {
       final response = await _dio.post(
         '/auth/login',
-        data: {'email': email, 'password': password},
+        data: {'usernameOrEmail': usernameOrEmail, 'password': password},
       );
       if (response.data is Map) {
         final data = response.data['data'];
@@ -90,12 +95,19 @@ class ApiService {
     }
   }
 
-  Future<void> register(String name, String email, String phone, String password) async {
+  Future<void> register(
+    String name,
+    String username,
+    String email,
+    String phone,
+    String password,
+  ) async {
     try {
       await _dio.post(
         '/auth/register',
         data: {
           'name': name,
+          'username': username,
           'email': email,
           'phone': phone,
           'password': password,
@@ -194,6 +206,28 @@ class ApiService {
     }
   }
 
+  Future<List<ProductModel>> getFeaturedProducts() async {
+    try {
+      final response = await _dio.get('/products/featured');
+      final data = response.data['data'] as List;
+      return data.map((e) => ProductModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<ProductModel>> getLowStockProducts() async {
+    try {
+      final response = await _dio.get('/products/low-stock');
+      final data = response.data['data'] as List;
+      return data.map((e) => ProductModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
   // --- Categories ---
   Future<List<CategoryModel>> fetchCategories() async {
     try {
@@ -239,7 +273,10 @@ class ApiService {
 
   Future<CategoryModel> updateCategory(int id, CategoryModel category) async {
     try {
-      final response = await _dio.put('/categories/$id', data: category.toJson());
+      final response = await _dio.put(
+        '/categories/$id',
+        data: category.toJson(),
+      );
       return CategoryModel.fromJson(response.data['data']);
     } catch (e) {
       if (e is DioException) throw Exception(_parseError(e));
@@ -311,6 +348,28 @@ class ApiService {
     }
   }
 
+  Future<List<OrderModel>> getOrdersByUserId(int userId) async {
+    try {
+      final response = await _dio.get('/orders/user/$userId');
+      final data = response.data['data'] as List;
+      return data.map((e) => OrderModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<OrderModel>> getOrdersByStatus(String status) async {
+    try {
+      final response = await _dio.get('/orders/status/$status');
+      final data = response.data['data'] as List;
+      return data.map((e) => OrderModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
   Future<void> cancelOrder(int id) async {
     try {
       await _dio.delete('/orders/$id/cancel');
@@ -321,6 +380,7 @@ class ApiService {
   }
 
   Future<OrderModel> createOrder({
+    required int? userId,
     required String customerName,
     required String email,
     required String phone,
@@ -332,6 +392,7 @@ class ApiService {
       final response = await _dio.post(
         '/orders',
         data: {
+          'userId': userId,
           'customerName': customerName,
           'email': email,
           'phone': phone,
@@ -388,6 +449,20 @@ class ApiService {
     }
   }
 
+  Future<void> changePassword(
+      int userId, String oldPassword, String newPassword) async {
+    try {
+      await _dio.put(
+        '/users/$userId/change-password',
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+      );
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+
   // --- Ratings ---
   Future<List<RatingModel>> getRatingsByProduct(int productId) async {
     try {
@@ -424,6 +499,279 @@ class ApiService {
   Future<void> deleteRating(int id) async {
     try {
       await _dio.delete('/ratings/$id');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  // --- Cart ---
+  Future<List<CartItemModel>> getCart(int userId) async {
+    try {
+      final response = await _dio.get('/cart/user/$userId');
+      final data = response.data['data'] as List;
+      return data.map((e) => CartItemModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<CartItemModel> addToCart(
+    int userId,
+    int productId,
+    int quantity,
+  ) async {
+    try {
+      final response = await _dio.post(
+        '/cart/user/$userId/add/$productId',
+        queryParameters: {'quantity': quantity},
+      );
+      return CartItemModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<CartItemModel> updateCartItem(
+    int userId,
+    int productId,
+    int quantity,
+  ) async {
+    try {
+      final response = await _dio.put(
+        '/cart/user/$userId/update/$productId',
+        queryParameters: {'quantity': quantity},
+      );
+      return CartItemModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> removeFromCart(int userId, int productId) async {
+    try {
+      await _dio.delete('/cart/user/$userId/remove/$productId');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> clearCart(int userId) async {
+    try {
+      await _dio.delete('/cart/user/$userId/clear');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  // --- Wishlist ---
+  Future<List<WishlistModel>> getWishlist(int userId) async {
+    try {
+      final response = await _dio.get('/wishlists/user/$userId');
+      final data = response.data['data'] as List;
+      return data.map((e) => WishlistModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<WishlistModel> addToWishlist(int userId, int productId) async {
+    try {
+      final response = await _dio.post('/wishlists/user/$userId/add/$productId');
+      return WishlistModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> removeFromWishlist(int userId, int productId) async {
+    try {
+      await _dio.delete('/wishlists/user/$userId/remove/$productId');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  // --- Inventory ---
+  Future<List<InventoryLogModel>> getInventoryLogs() async {
+    try {
+      final response = await _dio.get('/inventory/logs');
+      final data = response.data['data'] as List;
+      return data.map((e) => InventoryLogModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> createInventoryLog(
+    int productId,
+    int changeQuantity,
+    String logType,
+    String notes,
+  ) async {
+    try {
+      await _dio.post(
+        '/inventory/log',
+        data: {
+          'productId': productId,
+          'changeQuantity': changeQuantity,
+          'logType': logType,
+          'notes': notes,
+        },
+      );
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<InventoryLogModel>> getInventoryLogsByProduct(int productId) async {
+    try {
+      final response = await _dio.get('/inventory/product/$productId');
+      final data = response.data['data'] as List;
+      return data.map((e) => InventoryLogModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  // --- Payments ---
+  Future<PaymentModel> createPayment(
+    int orderId,
+    double amount,
+    String paymentMethod,
+  ) async {
+    try {
+      final response = await _dio.post(
+        '/payments',
+        data: {
+          'orderId': orderId,
+          'amount': amount,
+          'paymentMethod': paymentMethod,
+          'status': 'pending',
+        },
+      );
+      final data = response.data['data'];
+      return PaymentModel.fromJson(data);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<PaymentModel> getPaymentById(int id) async {
+    try {
+      final response = await _dio.get('/payments/$id');
+      final data = response.data['data'];
+      return PaymentModel.fromJson(data);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<PaymentModel>> getPaymentsByOrderId(int orderId) async {
+    try {
+      final response = await _dio.get('/payments/order/$orderId');
+      final data = response.data['data'] as List;
+      return data.map((e) => PaymentModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<PaymentModel>> getPaymentsByUserId(int userId) async {
+    try {
+      final response = await _dio.get('/payments/user/$userId');
+      final data = response.data['data'] as List;
+      return data.map((e) => PaymentModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<PaymentModel>> getAllPayments() async {
+    try {
+      final response = await _dio.get('/payments');
+      final data = response.data['data'] as List;
+      return data.map((e) => PaymentModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<PaymentModel> updatePaymentStatus(int id, String status) async {
+    try {
+      final response = await _dio.patch(
+        '/payments/$id/status',
+        queryParameters: {'status': status},
+      );
+      final data = response.data['data'];
+      return PaymentModel.fromJson(data);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  // --- Dashboard ---
+  Future<DashboardStatsModel> getDashboardStats() async {
+    try {
+      final response = await _dio.get('/dashboard/stats');
+      final data = response.data['data'];
+      return DashboardStatsModel.fromJson(data);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<Map<String, double>> getRevenueByPeriod(String period) async {
+    try {
+      final response = await _dio.get(
+        '/dashboard/revenue',
+        queryParameters: {'period': period},
+      );
+      final data = response.data['data'] as Map<String, dynamic>;
+      return data.map((key, value) => MapEntry(key, (value as num).toDouble()));
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<TopProductModel>> getTopProducts(int? limit) async {
+    try {
+      final response = await _dio.get(
+        '/dashboard/top-products',
+        queryParameters: limit != null ? {'limit': limit} : null,
+      );
+      final data = response.data['data'] as List;
+      return data.map((e) => TopProductModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<Map<String, int>> getOrderStatsByStatus() async {
+    try {
+      final response = await _dio.get('/dashboard/order-stats');
+      final data = response.data['data'] as Map<String, dynamic>;
+      return data.map((key, value) => MapEntry(key, (value as num).toInt()));
     } catch (e) {
       if (e is DioException) throw Exception(_parseError(e));
       rethrow;

@@ -103,6 +103,7 @@ public class CartItemService {
         dto.setProductImage(cartItem.getProduct().getImage());
         dto.setProductPrice(cartItem.getProduct().getPrice());
         dto.setQuantity(cartItem.getQuantity());
+        dto.setProductStock(cartItem.getProduct().getQuantity());
         return dto;
     }
 }

@@ -12,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProviderStateMixin {
   final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -42,6 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
   @override
   void dispose() {
     _nameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -55,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Passwords do not match'),
+            content: const Text('Mật khẩu không khớp'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -70,6 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
 
       final success = await authProvider.register(
         _nameController.text.trim(),
+        _usernameController.text.trim(),
         _emailController.text.trim(),
         _phoneController.text.trim(),
         _passwordController.text.trim(),
@@ -78,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
-            content: const Text('Registration successful! Please login.'),
+            content: const Text('Đăng ký thành công! Vui lòng đăng nhập.'),
             backgroundColor: AppColors.secondary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -89,9 +92,9 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authProvider.errorMessage ?? 'Registration failed'),
+            content: Text(authProvider.errorMessage ?? 'Đăng ký thất bại'),
             backgroundColor: AppColors.error,
-             behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             margin: const EdgeInsets.all(16),
           ),
@@ -105,10 +108,11 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Create Account'),
-        backgroundColor: Colors.transparent,
+        title: const Text('Tạo tài khoản'),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        foregroundColor: AppColors.textMain,
+        foregroundColor: Colors.white,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -133,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Join Us!',
+                  'Tham gia ngay!',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textMain,
@@ -142,7 +146,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                 ),
                  const SizedBox(height: 8),
                 Text(
-                  'Create your account to get started',
+                  'Tạo tài khoản để bắt đầu',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey[600],
                   ),
@@ -171,9 +175,16 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                       children: [
                         _buildTextField(
                           controller: _nameController,
-                          label: 'Full Name',
+                          label: 'Họ và tên',
                           icon: Icons.person_rounded,
-                          validator: (value) => value!.isEmpty ? 'Name is required' : null,
+                          validator: (value) => value!.isEmpty ? 'Họ tên là bắt buộc' : null,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _usernameController,
+                          label: 'Tên đăng nhập',
+                          icon: Icons.account_circle_rounded,
+                          validator: (value) => value!.isEmpty ? 'Tên đăng nhập là bắt buộc' : null,
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
@@ -182,41 +193,41 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                           icon: Icons.email_rounded,
                           inputType: TextInputType.emailAddress,
                            validator: (value) {
-                                if (value == null || value.isEmpty) return 'Email is required';
-                                if (!value.contains('@')) return 'Invalid email';
+                                if (value == null || value.isEmpty) return 'Email là bắt buộc';
+                                if (!value.contains('@')) return 'Email không hợp lệ';
                                 return null;
                               },
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           controller: _phoneController,
-                          label: 'Phone',
+                          label: 'Số điện thoại',
                           icon: Icons.phone_rounded,
                           inputType: TextInputType.phone,
                           validator: (value) {
-                            if (value == null || value.isEmpty) return 'Phone is required';
+                            if (value == null || value.isEmpty) return 'Số điện thoại là bắt buộc';
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           controller: _passwordController,
-                          label: 'Password',
+                          label: 'Mật khẩu',
                           icon: Icons.lock_rounded,
                           isPassword: true,
                           obscureText: _obscurePassword,
                           onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
-                           validator: (value) => value!.length < 6 ? 'Password too short' : null,
+                           validator: (value) => value!.length < 6 ? 'Mật khẩu quá ngắn (tối thiểu 6 ký tự)' : null,
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           controller: _confirmPasswordController,
-                          label: 'Confirm Password',
+                          label: 'Xác nhận mật khẩu',
                           icon: Icons.lock_outline_rounded,
                           isPassword: true,
                           obscureText: _obscureConfirmPassword,
                           onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-                           validator: (value) => value!.isEmpty ? 'Please confirm password' : null,
+                           validator: (value) => value!.isEmpty ? 'Vui lòng xác nhận mật khẩu' : null,
                         ),
                         const SizedBox(height: 32),
                          Consumer<AuthProvider>(
@@ -244,7 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                                             ),
                                           )
                                         : const Text(
-                                            'Sign Up',
+                                            'Đăng ký',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -264,7 +275,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Already have an account? ',
+                          'Đã có tài khoản? ',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                         TextButton(
@@ -272,7 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                             Navigator.pop(context);
                           },
                           child: const Text(
-                            'Sign In',
+                            'Đăng nhập',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,

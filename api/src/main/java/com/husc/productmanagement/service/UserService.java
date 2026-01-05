@@ -44,13 +44,18 @@ public class UserService {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new RuntimeException("Email already exists: " + userDTO.getEmail());
         }
+        if (userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException("Username already exists: " + userDTO.getUsername());
+        }
 
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
+        user.setUsername(userDTO.getUsername());
         user.setPhone(userDTO.getPhone());
+        user.setAddress(userDTO.getAddress());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(userDTO.getRole() != null ? User.Role.valueOf(userDTO.getRole().toUpperCase()) : User.Role.USER);
+        user.setRole(userDTO.getRole() != null ? User.Role.fromValue(userDTO.getRole()) : User.Role.USER);
         user.setStatus(User.Status.ACTIVE);
 
         User savedUser = userRepository.save(user);
@@ -65,17 +70,39 @@ public class UserService {
         if (userDTO.getName() != null) {
             user.setName(userDTO.getName());
         }
+        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new RuntimeException("Email already exists: " + userDTO.getEmail());
+            }
+            user.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(userDTO.getUsername())) {
+                throw new RuntimeException("Username already exists: " + userDTO.getUsername());
+            }
+            user.setUsername(userDTO.getUsername());
+        }
         if (userDTO.getPhone() != null) {
             user.setPhone(userDTO.getPhone());
+        }
+        if (userDTO.getAddress() != null) {
+            user.setAddress(userDTO.getAddress());
         }
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
+        // Only allow updating role/status if explicitly provided and typically for
+        // admins
+        // But per request "keep user, status unchanged", we might just skip them or
+        // trust the input.
+        // I will keep existing logic but use fromValue which is safer
         if (userDTO.getRole() != null) {
-            user.setRole(User.Role.valueOf(userDTO.getRole().toUpperCase()));
+            user.setRole(User.Role.fromValue(userDTO.getRole()));
         }
+        // Status typically shouldn't be updated loosely, but keeping existing logic
+        // structure
         if (userDTO.getStatus() != null) {
-            user.setStatus(User.Status.valueOf(userDTO.getStatus().toUpperCase()));
+            user.setStatus(User.Status.fromValue(userDTO.getStatus()));
         }
 
         User updatedUser = userRepository.save(user);
@@ -90,14 +117,30 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    @Transactional
+    public void changePassword(Integer userId, com.husc.productmanagement.dto.ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Incorrect old password");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
+        dto.setUsername(user.getUsername());
         dto.setPhone(user.getPhone());
-        dto.setRole(user.getRole().name().toLowerCase());
-        dto.setStatus(user.getStatus().name().toLowerCase());
+        dto.setAddress(user.getAddress());
+        dto.setRole(user.getRole().getValue());
+        dto.setStatus(user.getStatus().getValue());
+        dto.setCreatedAt(user.getCreatedAt());
         // Don't include password in DTO
         return dto;
     }

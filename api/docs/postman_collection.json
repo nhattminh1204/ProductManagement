@@ -25,11 +25,12 @@
 							"raw": "{\n  \"name\": \"Nguyen Van A\",\n  \"username\": \"nguynvana\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"0123456789\",\n  \"address\": \"123 Main St, Hanoi\",\n  \"password\": \"password123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/register",
+							"raw": "{{base_url}}/api/auth/register",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"auth",
 								"register"
 							]
@@ -53,11 +54,12 @@
 							"raw": "{\n  \"usernameOrEmail\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/login",
+							"raw": "{{base_url}}/api/auth/login",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"auth",
 								"login"
 							]
@@ -77,11 +79,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/categories",
+							"raw": "{{base_url}}/api/categories",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories"
 							]
 						},
@@ -95,11 +98,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/categories/active",
+							"raw": "{{base_url}}/api/categories/active",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories",
 								"active"
 							]
@@ -114,11 +118,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/categories/1",
+							"raw": "{{base_url}}/api/categories/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories",
 								"1"
 							]
@@ -142,11 +147,12 @@
 							"raw": "{\n  \"name\": \"Electronics\",\n  \"status\": \"active\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/categories",
+							"raw": "{{base_url}}/api/categories",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories"
 							]
 						},
@@ -169,11 +175,12 @@
 							"raw": "{\n  \"name\": \"Electronics Updated\",\n  \"status\": \"active\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/categories/1",
+							"raw": "{{base_url}}/api/categories/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories",
 								"1"
 							]
@@ -188,11 +195,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/categories/1",
+							"raw": "{{base_url}}/api/categories/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"categories",
 								"1"
 							]
@@ -212,11 +220,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products",
+							"raw": "{{base_url}}/api/products",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products"
 							]
 						},
@@ -230,11 +239,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products/active",
+							"raw": "{{base_url}}/api/products/active",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"active"
 							]
@@ -249,11 +259,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products/1",
+							"raw": "{{base_url}}/api/products/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"1"
 							]
@@ -268,11 +279,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products/category/1",
+							"raw": "{{base_url}}/api/products/category/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"category",
 								"1"
@@ -288,11 +300,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products/search?keyword=iPhone",
+							"raw": "{{base_url}}/api/products/search?keyword=iPhone",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"search"
 							],
@@ -322,11 +335,12 @@
 							"raw": "{\n  \"name\": \"iPhone 15 Pro\",\n  \"description\": \"The latest iPhone\",\n  \"image\": \"https://example.com/iphone.jpg\",\n  \"price\": 999.99,\n  \"discountPrice\": 899.99,\n  \"quantity\": 50,\n  \"status\": \"active\",\n  \"categoryId\": 1\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/products",
+							"raw": "{{base_url}}/api/products",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products"
 							]
 						},
@@ -349,11 +363,12 @@
 							"raw": "{\n  \"name\": \"iPhone 15 Pro Max\",\n  \"description\": \"Updated description\",\n  \"image\": \"https://example.com/iphone.jpg\",\n  \"price\": 1199.99,\n  \"discountPrice\": 1099.99,\n  \"quantity\": 30,\n  \"status\": \"active\",\n  \"categoryId\": 1\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/products/1",
+							"raw": "{{base_url}}/api/products/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"1"
 							]
@@ -368,16 +383,57 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/products/1",
+							"raw": "{{base_url}}/api/products/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"products",
 								"1"
 							]
 						},
 						"description": "Delete product by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Featured Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/featured",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"featured"
+							]
+						},
+						"description": "Get featured products (rating >= 4.0)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Low Stock Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/low-stock",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"low-stock"
+							]
+						},
+						"description": "Get low stock products (quantity <= 10)"
 					},
 					"response": []
 				}
@@ -392,11 +448,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders",
+							"raw": "{{base_url}}/api/orders",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders"
 							]
 						},
@@ -410,11 +467,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders/1",
+							"raw": "{{base_url}}/api/orders/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders",
 								"1"
 							]
@@ -429,11 +487,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders/code/ORD-20251224-001",
+							"raw": "{{base_url}}/api/orders/code/ORD-20251224-001",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders",
 								"code",
 								"ORD-20251224-001"
@@ -449,17 +508,60 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders/customer/test@example.com",
+							"raw": "{{base_url}}/api/orders/customer/test@example.com",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders",
 								"customer",
 								"test@example.com"
 							]
 						},
 						"description": "Get orders by customer email"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders By User ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/orders/user/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"user",
+								"1"
+							]
+						},
+						"description": "Get orders by user ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders By Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/orders/status/pending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"status",
+								"pending"
+							]
+						},
+						"description": "Get orders by status (pending, paid, shipped, cancelled)"
 					},
 					"response": []
 				},
@@ -478,11 +580,12 @@
 							"raw": "{\n  \"customerName\": \"Nguyen Van A\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"0123456789\",\n  \"address\": \"123 Main St, Hanoi\",\n  \"paymentMethod\": \"credit_card\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2\n    }\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/orders",
+							"raw": "{{base_url}}/api/orders",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders"
 							]
 						},
@@ -496,11 +599,12 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders/1/status?status=paid",
+							"raw": "{{base_url}}/api/orders/1/status?status=paid",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders",
 								"1",
 								"status"
@@ -523,11 +627,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/orders/1/cancel",
+							"raw": "{{base_url}}/api/orders/1/cancel",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"orders",
 								"1",
 								"cancel"
@@ -548,11 +653,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users",
+							"raw": "{{base_url}}/api/users",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"users"
 							]
 						},
@@ -566,11 +672,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/api/users/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"users",
 								"1"
 							]
@@ -594,11 +701,12 @@
 							"raw": "{\n  \"name\": \"Nguyen Van A Updated\",\n  \"username\": \"nguyenvana\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"0987654321\",\n  \"address\": \"New Address\",\n  \"role\": \"user\",\n  \"status\": \"active\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/api/users/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"users",
 								"1"
 							]
@@ -613,11 +721,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/1",
+							"raw": "{{base_url}}/api/users/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"users",
 								"1"
 							]
@@ -637,11 +746,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/ratings/product/1",
+							"raw": "{{base_url}}/api/ratings/product/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"ratings",
 								"product",
 								"1"
@@ -657,11 +767,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/ratings/user/1",
+							"raw": "{{base_url}}/api/ratings/user/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"ratings",
 								"user",
 								"1"
@@ -686,11 +797,12 @@
 							"raw": "{\n  \"productId\": 1,\n  \"userId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great product!\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/ratings",
+							"raw": "{{base_url}}/api/ratings",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"ratings"
 							]
 						},
@@ -704,11 +816,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/ratings/1",
+							"raw": "{{base_url}}/api/ratings/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"ratings",
 								"1"
 							]
@@ -728,11 +841,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/wishlists/user/1",
+							"raw": "{{base_url}}/api/wishlists/user/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"wishlists",
 								"user",
 								"1"
@@ -748,11 +862,12 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/wishlists/user/1/add/1",
+							"raw": "{{base_url}}/api/wishlists/user/1/add/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"wishlists",
 								"user",
 								"1",
@@ -770,11 +885,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/wishlists/user/1/remove/1",
+							"raw": "{{base_url}}/api/wishlists/user/1/remove/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"wishlists",
 								"user",
 								"1",
@@ -797,11 +913,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/cart/user/1",
+							"raw": "{{base_url}}/api/cart/user/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"cart",
 								"user",
 								"1"
@@ -817,11 +934,12 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/cart/user/1/add/1?quantity=1",
+							"raw": "{{base_url}}/api/cart/user/1/add/1?quantity=1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"cart",
 								"user",
 								"1",
@@ -845,11 +963,12 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/cart/user/1/update/1?quantity=2",
+							"raw": "{{base_url}}/api/cart/user/1/update/1?quantity=2",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"cart",
 								"user",
 								"1",
@@ -873,11 +992,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/cart/user/1/remove/1",
+							"raw": "{{base_url}}/api/cart/user/1/remove/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"cart",
 								"user",
 								"1",
@@ -895,11 +1015,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/cart/user/1/clear",
+							"raw": "{{base_url}}/api/cart/user/1/clear",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"cart",
 								"user",
 								"1",
@@ -930,11 +1051,12 @@
 							"raw": "{\n  \"productId\": 1,\n  \"changeQuantity\": 10,\n  \"logType\": \"import\",\n  \"notes\": \"Restocking\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/inventory/log",
+							"raw": "{{base_url}}/api/inventory/log",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"inventory",
 								"log"
 							]
@@ -949,11 +1071,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/inventory/product/1",
+							"raw": "{{base_url}}/api/inventory/product/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"inventory",
 								"product",
 								"1"
@@ -969,11 +1092,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/inventory/logs",
+							"raw": "{{base_url}}/api/inventory/logs",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
+								"api",
 								"inventory",
 								"logs"
 							]
@@ -983,12 +1107,321 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "10. Payments",
+			"item": [
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": 1,\n  \"amount\": 999.99,\n  \"paymentMethod\": \"credit_card\",\n  \"status\": \"pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/payments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						},
+						"description": "Create a new payment"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1"
+							]
+						},
+						"description": "Get payment by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payments By Order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments/order/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"order",
+								"1"
+							]
+						},
+						"description": "Get all payments for an order"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payments By User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments/user/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"user",
+								"1"
+							]
+						},
+						"description": "Get payment history for a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Payments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						},
+						"description": "Get all payments (admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/payments/1/status?status=paid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "paid",
+									"description": "Status: pending, paid, failed"
+								}
+							]
+						},
+						"description": "Update payment status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "11. Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"stats"
+							]
+						},
+						"description": "Get dashboard statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue By Period",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/revenue?period=monthly",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"revenue"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "monthly",
+									"description": "Period: daily, weekly, monthly, yearly"
+								}
+							]
+						},
+						"description": "Get revenue by period"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/top-products?limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"top-products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get top selling products"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Stats By Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/order-stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"order-stats"
+							]
+						},
+						"description": "Get order statistics by status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wishlists",
+			"item": [
+				{
+					"name": "Get User Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/wishlists/user/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add To Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/wishlists/user/1/add/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"user",
+								"1",
+								"add",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove From Wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/wishlists/user/1/remove/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"user",
+								"1",
+								"remove",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080/api",
+			"value": "http://localhost:8080",
 			"type": "string"
 		}
 	]

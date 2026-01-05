@@ -32,12 +32,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/categories/**").permitAll()
-                        .requestMatchers("/api/orders/**").permitAll()
-                        .requestMatchers("/api/ratings/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll() // Thêm users
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/categories/**").permitAll()
+                        .requestMatchers("/orders/**").permitAll()
+                        .requestMatchers("/ratings/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
                         .anyRequest().permitAll()); // Cho phép tất cả để test
 
         return http.build();

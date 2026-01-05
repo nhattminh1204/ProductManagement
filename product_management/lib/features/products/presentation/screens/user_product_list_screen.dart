@@ -6,6 +6,7 @@ import '../../../orders/presentation/providers/cart_provider.dart';
 import '../widgets/product_card_user.dart';
 import '../../../shared/design_system.dart';
 import '../../../orders/presentation/screens/cart_screen.dart';
+import '../../../shared/widgets/add_to_cart_animation.dart';
 
 class UserProductListScreen extends StatefulWidget {
   const UserProductListScreen({super.key});
@@ -23,7 +24,7 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().fetchProducts();
-      context.read<CategoryProvider>().fetchCategories(); 
+      context.read<CategoryProvider>().fetchCategories();
     });
   }
 
@@ -37,6 +38,25 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
     context.read<ProductProvider>().searchProducts(value);
   }
 
+  final GlobalKey _cartKey = GlobalKey();
+
+  void _handleAddToCart(GlobalKey imageKey, var product) {
+    if (product.image == null || product.image!.isEmpty) {
+      context.read<CartProvider>().addToCart(product);
+      return;
+    }
+
+    AddToCartAnimation.run(
+      context,
+      imageKey: imageKey,
+      cartKey: _cartKey,
+      imageUrl: product.image!,
+      onComplete: () {
+        context.read<CartProvider>().addToCart(product);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final productProvider = context.watch<ProductProvider>();
@@ -44,10 +64,12 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
 
     // Client-side filter
     List displayProducts = productProvider.products;
-    
+
     // Filter by Category
     if (_selectedCategory != null) {
-      displayProducts = displayProducts.where((p) => p.categoryName == _selectedCategory).toList();
+      displayProducts = displayProducts
+          .where((p) => p.categoryName == _selectedCategory)
+          .toList();
     }
 
     return Scaffold(
@@ -56,27 +78,26 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
         slivers: [
           // Elegant App Bar
           SliverAppBar(
-            expandedHeight: 120.0,
-            floating: true,
             pinned: true,
+            floating: false,
             elevation: 0,
-            backgroundColor: AppColors.background,
+            backgroundColor: AppColors.primary,
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-              title: Text(
-                'Discover Products',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMain, 
-                ),
+            title: Text(
+              'Sản phẩm',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              centerTitle: false,
             ),
-             actions: [
+            centerTitle: true,
+            actions: [
               IconButton(
-                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textMain),
+                icon: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () {},
               ),
               const SizedBox(width: 8),
@@ -86,13 +107,16 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
           // Search Bar
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 10.0,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
-                     BoxShadow(
+                    BoxShadow(
                       color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 15,
                       offset: const Offset(0, 4),
@@ -101,12 +125,18 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                   decoration: InputDecoration(
-                    hintText: 'Search furniture, tools...',
+                  decoration: InputDecoration(
+                    hintText: 'Tìm kiếm sản phẩm...',
                     hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search_rounded, color: AppColors.primary.withValues(alpha: 0.7)),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.primary.withValues(alpha: 0.7),
+                    ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
                   ),
@@ -118,65 +148,84 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
 
           // Categories Filter (Horizontal)
           SliverToBoxAdapter(
-             child: Container(
+            child: Container(
               height: 50,
               margin: const EdgeInsets.only(bottom: 16),
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  _buildCategoryChip('All', _selectedCategory == null, onTap: () {
-                    setState(() {
-                      _selectedCategory = null;
-                    });
+                  _buildCategoryChip(
+                    'Tất cả',
+                    _selectedCategory == null,
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = null;
+                      });
+                    },
+                  ),
+                  ...categoryProvider.categories.map((cat) {
+                    return _buildCategoryChip(
+                      cat.name,
+                      _selectedCategory == cat.name,
+                      onTap: () {
+                        setState(() {
+                          if (_selectedCategory == cat.name) {
+                            _selectedCategory = null;
+                          } else {
+                            _selectedCategory = cat.name;
+                          }
+                        });
+                      },
+                    );
                   }),
-                   ...categoryProvider.categories.map((cat) {
-                       return _buildCategoryChip(cat.name, _selectedCategory == cat.name, onTap: () {
-                          setState(() {
-                            if (_selectedCategory == cat.name) {
-                              _selectedCategory = null;
-                            } else {
-                              _selectedCategory = cat.name;
-                            }
-                          });
-                       });
-                   }),
                 ],
               ),
-             ),
+            ),
           ),
-          
+
           // Product Grid
           productProvider.isLoading
-              ? const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+              ? const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                )
               : productProvider.errorMessage != null
-                  ? SliverFillRemaining(child: Center(child: Text('Error: ${productProvider.errorMessage}')))
-                  : displayProducts.isEmpty
-                      ? const SliverFillRemaining(child: Center(child: Text('No active products found')))
-                      : SliverPadding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          sliver: SliverGrid(
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.8,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                            ),
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final product = displayProducts[index];
-                                return RepaintBoundary(
-                                  child: ProductCardUser(
-                                    key: ValueKey(product.id),
-                                    product: product,
-                                  ),
-                                );
-                              },
-                              childCount: displayProducts.length,
-                            ),
-                          ),
+              ? SliverFillRemaining(
+                  child: Center(
+                    child: Text('Error: ${productProvider.errorMessage}'),
+                  ),
+                )
+              : displayProducts.isEmpty
+              ? const SliverFillRemaining(
+                  child: Center(child: Text('No active products found')),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  sliver: SliverGrid(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 0.65,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
                         ),
-           SliverPadding(padding: EdgeInsets.only(bottom: 100))
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final product = displayProducts[index];
+                      return RepaintBoundary(
+                        child: ProductCardUser(
+                          key: ValueKey(product.id),
+                          product: product,
+                          onAddToCart: (imageKey) async =>
+                              _handleAddToCart(imageKey, product),
+                        ),
+                      );
+                    }, childCount: displayProducts.length),
+                  ),
+                ),
+          SliverPadding(padding: EdgeInsets.only(bottom: 100)),
         ],
       ),
       floatingActionButton: Consumer<CartProvider>(
@@ -185,6 +234,7 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
             clipBehavior: Clip.none,
             children: [
               FloatingActionButton(
+                key: _cartKey,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -192,7 +242,10 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                   );
                 },
                 backgroundColor: AppColors.primary,
-                child: const Icon(Icons.shopping_cart_rounded, color: Colors.white),
+                child: const Icon(
+                  Icons.shopping_cart_rounded,
+                  color: Colors.white,
+                ),
               ),
               if (cartProvider.getItemCount > 0)
                 Positioned(
@@ -228,7 +281,11 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
     );
   }
 
-  Widget _buildCategoryChip(String label, bool isSelected, {required VoidCallback onTap}) {
+  Widget _buildCategoryChip(
+    String label,
+    bool isSelected, {
+    required VoidCallback onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: GestureDetector(
@@ -242,13 +299,15 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
             border: Border.all(
               color: isSelected ? AppColors.primary : Colors.grey.shade200,
             ),
-            boxShadow: isSelected ? [
-               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ] : [],
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
           ),
           child: Center(
             child: Text(
@@ -265,5 +324,3 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
     );
   }
 }
-
-

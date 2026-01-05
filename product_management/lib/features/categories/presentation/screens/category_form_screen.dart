@@ -50,8 +50,8 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.category == null
-                ? 'Category created successfully'
-                : 'Category updated successfully'),
+                ? 'Tạo danh mục thành công'
+                : 'Cập nhật danh mục thành công'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -64,7 +64,9 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category == null ? 'Create Category' : 'Edit Category'),
+        title: Text(widget.category == null ? 'Tạo danh mục' : 'Sửa danh mục'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -76,20 +78,20 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Category Name',
+                  labelText: 'Tên danh mục',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.category),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Category name is required';
+                    return 'Vui lòng nhập tên danh mục';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 24),
               const Text(
-                'Status',
+                'Trạng thái',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -97,12 +99,12 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                 segments: const [
                   ButtonSegment(
                     value: 'active',
-                    label: Text('Active'),
+                    label: Text('Hoạt động'),
                     icon: Icon(Icons.check_circle),
                   ),
                   ButtonSegment(
                     value: 'inactive',
-                    label: Text('Inactive'),
+                    label: Text('Tạm ẩn'),
                     icon: Icon(Icons.cancel),
                   ),
                 ],
@@ -129,7 +131,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(
-                            widget.category == null ? 'Create Category' : 'Update Category',
+                            widget.category == null ? 'Tạo mới' : 'Cập nhật',
                             style: const TextStyle(fontSize: 16),
                           ),
                   );
@@ -142,5 +144,3 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
     );
   }
 }
-
-

@@ -122,6 +122,35 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductDTO> getFeaturedProducts() {
+        // Featured products: high rating (>= 4.0) and active
+        return productRepository.findByStatus(Product.Status.ACTIVE).stream()
+                .filter(product -> {
+                    Double avgRating = ratingRepository.getAverageRatingByProductId(product.getId());
+                    return avgRating != null && avgRating >= 4.0;
+                })
+                .map(this::convertToDTO)
+                .sorted((p1, p2) -> {
+                    Double r1 = p1.getAverageRating() != null ? p1.getAverageRating() : 0.0;
+                    Double r2 = p2.getAverageRating() != null ? p2.getAverageRating() : 0.0;
+                    return r2.compareTo(r1);
+                })
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> getLowStockProducts() {
+        // Low stock: quantity <= 10
+        int threshold = 10;
+        return productRepository.findByStatus(Product.Status.ACTIVE).stream()
+                .filter(product -> product.getQuantity() <= threshold)
+                .map(this::convertToDTO)
+                .sorted((p1, p2) -> p1.getQuantity().compareTo(p2.getQuantity()))
+                .collect(Collectors.toList());
+    }
+
     private ProductDTO convertToDTO(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());

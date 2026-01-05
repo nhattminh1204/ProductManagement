@@ -16,6 +16,8 @@ public class OrderDTO {
 
     private Integer id;
 
+    private Integer userId;
+
     private String orderCode;
 
     @NotBlank(message = "Customer name is required")
@@ -42,4 +44,8 @@ public class OrderDTO {
     @Size(min = 1, message = "At least one item is required")
     @Valid
     private List<OrderItemDTO> items;
+
+    private java.time.LocalDateTime createdAt;
+
+    private List<PaymentDTO> payments;
 }

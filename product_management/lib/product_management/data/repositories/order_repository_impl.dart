@@ -1,8 +1,7 @@
-import '../../../../api/api_service.dart';
+import '../../../api/api_service.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/repositories.dart';
 import '../../../../features/orders/data/models/order_model.dart';
-import '../../../../features/orders/data/models/order_item_model.dart';
 
 class OrderRepositoryImpl implements OrderRepository {
   final ApiService _apiService;
@@ -20,13 +19,17 @@ class OrderRepositoryImpl implements OrderRepository {
       totalPrice: model.totalPrice,
       status: model.status,
       createdDate: model.createdDate,
-      items: model.items.map((i) => OrderItem(
-        productId: i.productId,
-        productName: i.productName,
-        productImage: i.productImage,
-        price: i.price,
-        quantity: i.quantity,
-      )).toList(),
+      items: model.items
+          .map(
+            (i) => OrderItem(
+              productId: i.productId,
+              productName: i.productName,
+              productImage: i.productImage,
+              price: i.price,
+              quantity: i.quantity,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -55,15 +58,20 @@ class OrderRepositoryImpl implements OrderRepository {
   @override
   Future<Order> createOrder(Order order) async {
     // Map items to JSON for API
-    final itemsJson = order.items.map((i) => {
-      'productId': i.productId,
-      'productName': i.productName,
-      'productImage': i.productImage,
-      'price': i.price,
-      'quantity': i.quantity,
-    }).toList();
+    final itemsJson = order.items
+        .map(
+          (i) => {
+            'productId': i.productId,
+            'productName': i.productName,
+            'productImage': i.productImage,
+            'price': i.price,
+            'quantity': i.quantity,
+          },
+        )
+        .toList();
 
     final newModel = await _apiService.createOrder(
+      userId: null,
       customerName: order.customerName,
       email: order.email ?? '',
       phone: order.phone ?? '',

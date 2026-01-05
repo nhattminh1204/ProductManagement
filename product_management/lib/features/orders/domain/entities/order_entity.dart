@@ -7,6 +7,7 @@ class Order {
   final String? email;
   final String? phone;
   final String? address;
+  final int? userId;
   final String? paymentMethod;
   final double totalPrice;
   final String status;
@@ -20,6 +21,7 @@ class Order {
     this.email,
     this.phone,
     this.address,
+    this.userId,
     this.paymentMethod,
     required this.totalPrice,
     required this.status,

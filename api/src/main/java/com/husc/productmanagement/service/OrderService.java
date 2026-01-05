@@ -2,6 +2,8 @@ package com.husc.productmanagement.service;
 
 import com.husc.productmanagement.dto.OrderDTO;
 import com.husc.productmanagement.dto.OrderItemDTO;
+import com.husc.productmanagement.dto.PaymentDTO;
+import com.husc.productmanagement.dto.PaymentRequest;
 import com.husc.productmanagement.entity.Order;
 import com.husc.productmanagement.entity.OrderDetail;
 import com.husc.productmanagement.entity.Product;
@@ -26,6 +28,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
+    private final PaymentService paymentService;
+    private final com.husc.productmanagement.repository.UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<OrderDTO> getAllOrders() {
@@ -55,6 +59,21 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getOrdersByUserId(Integer userId) {
+        return orderRepository.findByUserId(userId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getOrdersByStatus(String status) {
+        Order.Status orderStatus = Order.Status.fromValue(status);
+        return orderRepository.findByStatus(orderStatus).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
         // Generate order code
@@ -69,6 +88,12 @@ public class OrderService {
         order.setAddress(orderDTO.getAddress());
         order.setPaymentMethod(orderDTO.getPaymentMethod());
         order.setStatus(Order.Status.PENDING);
+
+        if (orderDTO.getUserId() != null) {
+            com.husc.productmanagement.entity.User user = userRepository.findById(orderDTO.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + orderDTO.getUserId()));
+            order.setUser(user);
+        }
 
         // Calculate total and create order details
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -103,16 +128,55 @@ public class OrderService {
         order.setOrderDetails(orderDetails);
 
         Order savedOrder = orderRepository.save(order);
+
+        // Automatically create payment record with PENDING status
+        try {
+            PaymentRequest paymentRequest = new PaymentRequest();
+            paymentRequest.setOrderId(savedOrder.getId());
+            paymentRequest.setAmount(savedOrder.getTotalAmount());
+            paymentRequest.setPaymentMethod(savedOrder.getPaymentMethod());
+            paymentRequest.setStatus("pending");
+            paymentService.createPayment(savedOrder.getId(), paymentRequest);
+        } catch (Exception e) {
+            // Log error but don't fail order creation
+            System.err.println("Failed to create payment record: " + e.getMessage());
+        }
+
         return convertToDTO(savedOrder);
     }
 
     @Transactional
     public OrderDTO updateOrderStatus(Integer id, String status) {
+        Order.Status newStatus = Order.Status.valueOf(status.toUpperCase());
+
+        // If new status is CANCELLED, delegate to cancelOrder to handle stock
+        // restoration
+        if (newStatus == Order.Status.CANCELLED) {
+            cancelOrder(id);
+            return getOrderById(id);
+        }
+
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
 
-        order.setStatus(Order.Status.valueOf(status.toUpperCase()));
+        order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
+
+        // If order status is PAID, update payment status to PAID
+        if (newStatus == Order.Status.PAID) {
+            try {
+                List<PaymentDTO> paymentsForOrder = paymentService.getPaymentsByOrderId(id);
+                for (PaymentDTO paymentDTO : paymentsForOrder) {
+                    if ("pending".equalsIgnoreCase(paymentDTO.getStatus())) {
+                        paymentService.updatePaymentStatus(paymentDTO.getId(), "paid");
+                    }
+                }
+            } catch (Exception e) {
+                // Log error but don't fail order status update
+                System.err.println("Failed to update payment status: " + e.getMessage());
+            }
+        }
+
         return convertToDTO(updatedOrder);
     }
 
@@ -121,8 +185,10 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
 
-        if (order.getStatus() != Order.Status.PENDING) {
-            throw new RuntimeException("Only pending orders can be cancelled");
+        if (order.getStatus() == Order.Status.SHIPPED ||
+                order.getStatus() == Order.Status.DELIVERED ||
+                order.getStatus() == Order.Status.CANCELLED) {
+            throw new RuntimeException("Cannot cancel order with status: " + order.getStatus());
         }
 
         // Restore product quantities
@@ -152,6 +218,7 @@ public class OrderService {
         dto.setTotalAmount(order.getTotalAmount());
         dto.setPaymentMethod(order.getPaymentMethod());
         dto.setStatus(order.getStatus().name().toLowerCase());
+        dto.setCreatedAt(order.getCreatedAt());
 
         // Convert order details
         List<OrderItemDTO> items = order.getOrderDetails().stream()
@@ -166,6 +233,15 @@ public class OrderService {
                 })
                 .collect(Collectors.toList());
         dto.setItems(items);
+
+        // Convert payments
+        try {
+            List<PaymentDTO> payments = paymentService.getPaymentsByOrderId(order.getId());
+            dto.setPayments(payments);
+        } catch (Exception e) {
+            // If payment service fails, set empty list
+            dto.setPayments(new ArrayList<>());
+        }
 
         return dto;
     }

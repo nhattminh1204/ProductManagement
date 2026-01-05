@@ -9,6 +9,7 @@ class Product {
   final String? categoryName;
   final double? averageRating;
   final int? totalRatings;
+  final String? description;
 
   Product({
     required this.id,
@@ -21,6 +22,7 @@ class Product {
     this.categoryName,
     this.averageRating,
     this.totalRatings,
+    this.description,
   });
 }
 

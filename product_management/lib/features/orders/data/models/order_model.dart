@@ -36,16 +36,23 @@ class OrderModel {
       phone: json['phone'],
       address: json['address'],
       paymentMethod: json['paymentMethod'],
-      totalPrice: (json['totalPrice'] ?? 0).toDouble(),
+      totalPrice: _parseDouble(json['totalAmount']) ?? _parseDouble(json['totalPrice']) ?? 0.0,
       status: json['status'] ?? 'pending',
-      createdDate: json['createdDate'] != null
-          ? DateTime.parse(json['createdDate'])
+      createdDate: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
       items: (json['items'] as List<dynamic>?)
               ?.map((e) => OrderItemModel.fromJson(e))
               .toList() ??
           [],
     );
+  }
+
+  static double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 
   Map<String, dynamic> toJson() {

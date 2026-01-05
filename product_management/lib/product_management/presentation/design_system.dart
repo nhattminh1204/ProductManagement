@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFFE91E63); // Pink - Nổi bật
+  static const Color primary = Color(0xFFF0768B); // User requested Pink
   static const Color secondary = Color(0xFF10B981); // Emerald
   static const Color warning = Color(0xFFF59E0B); // Amber
   static const Color error = Color(0xFFEF4444); // Red

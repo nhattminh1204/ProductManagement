@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+import '../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../features/auth/presentation/screens/login_screen.dart';
+import '../../../features/orders/presentation/screens/user_order_history_screen.dart';
+import '../../../features/products/presentation/screens/user_product_list_screen.dart';
 import '../design_system.dart';
-import '../screens/user_order_history_screen.dart';
-import '../screens/login_screen.dart';
-import '../screens/user_product_list_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final int? currentIndex;

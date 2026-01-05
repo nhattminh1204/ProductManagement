@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_management/features/shared/presentation/widgets/admin_drawer.dart';
 import 'package:provider/provider.dart';
 import '../providers/category_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -41,8 +42,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     final categoryProvider = context.watch<CategoryProvider>();
 
     return Scaffold(
+      drawer: const AdminDrawer(),
       appBar: AppBar(
-        title: const Text('Category Management'),
+        title: const Text('Quản lý danh mục'),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -55,7 +60,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       body: categoryProvider.isLoading
         ? const Center(child: CircularProgressIndicator())
         : categoryProvider.errorMessage != null
-          ? Center(child: Text('Error: ${categoryProvider.errorMessage}'))
+          ? Center(child: Text('Lỗi: ${categoryProvider.errorMessage}'))
           : categoryProvider.categories.isEmpty
           ? Center(
               child: Column(
@@ -63,7 +68,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 children: [
                   const Icon(Icons.category_outlined, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
-                  const Text('No categories found'),
+                  const Text('Chưa có danh mục nào'),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -73,7 +78,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                       );
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text('Create First Category'),
+                    label: const Text('Tạo danh mục mới'),
                   ),
                 ],
               ),
@@ -107,7 +112,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            category.status,
+                            category.status == 'active' ? 'Hoạt động' : 'Tạm ẩn',
                             style: TextStyle(
                               color: category.status == 'active' 
                                   ? Colors.green[800] 
@@ -126,7 +131,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                 children: [
                                   Icon(Icons.edit, size: 20),
                                   SizedBox(width: 8),
-                                  Text('Edit'),
+                                  Text('Sửa'),
                                 ],
                               ),
                             ),
@@ -136,7 +141,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                 children: [
                                   Icon(Icons.delete, size: 20, color: Colors.red),
                                   SizedBox(width: 8),
-                                  Text('Delete', style: TextStyle(color: Colors.red)),
+                                  Text('Xóa', style: TextStyle(color: Colors.red)),
                                 ],
                               ),
                             ),
@@ -176,12 +181,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Category'),
-        content: Text('Are you sure you want to delete "${category.name}"?'),
+        title: const Text('Xóa danh mục'),
+        content: Text('Bạn có chắc chắn muốn xóa "${category.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: const Text('Hủy'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -190,15 +195,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               final success = await provider.deleteCategory(category.id);
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category deleted successfully')),
+                  const SnackBar(content: Text('Xóa danh mục thành công')),
                 );
               }
             },
-            child: const Text('Delete'),
+            child: const Text('Xóa'),
           ),
         ],
       ),
     );
   }
 }
-

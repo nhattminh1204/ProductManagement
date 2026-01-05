@@ -43,4 +43,12 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
     }
+
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @PathVariable Integer id,
+            @Valid @RequestBody com.husc.productmanagement.dto.ChangePasswordRequest request) {
+        userService.changePassword(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+    }
 }

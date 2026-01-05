@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../api/api_service.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../shared/design_system.dart';
-import 'user_order_history_screen.dart';
+import 'checkout_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -31,6 +32,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _nameController = TextEditingController();
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userId = context.read<AuthProvider>().userId;
+    if (userId != null) {
+      try {
+        final user = await ApiService().getUserById(userId);
+        if (mounted) {
+          setState(() {
+            if (_nameController.text.isEmpty) _nameController.text = user.name;
+            if (_phoneController.text.isEmpty && user.phone != null) {
+              _phoneController.text = user.phone!;
+            }
+            if (_addressController.text.isEmpty && user.address != null) {
+              _addressController.text = user.address!;
+            }
+            // Also ensure email is synced if not already set or different
+            if (_emailController.text.isEmpty) _emailController.text = user.email;
+          });
+        }
+      } catch (e) {
+        // debugPrint('Failed to load user data: $e');
+        // Fail silently as we can still proceed with empty fields
+      }
+    }
   }
 
   @override
@@ -49,12 +76,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       
       if (cartProvider.items.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cart is empty')),
+          const SnackBar(content: Text('Giỏ hàng trống')),
         );
         return;
       }
 
+      final userId = context.read<AuthProvider>().userId;
+
       final success = await orderProvider.createOrder(
+        userId: userId,
         customerName: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text,
@@ -65,36 +95,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       if (success && mounted) {
         cartProvider.clearCart();
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Order Placed!'),
-            content: const Text('Your order has been placed successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const UserOrderHistoryScreen()),
-                  );
-                },
-                child: const Text('View Orders'),
-              ),
-              TextButton(
-                 onPressed: () {
-                   Navigator.pop(ctx);
-                   Navigator.popUntil(context, (route) => route.isFirst);
-                 },
-                 child: const Text('Home'),
-              )
-            ],
-          ),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const CheckoutSuccessScreen()),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(orderProvider.errorMessage ?? 'Failed to place order')),
+           SnackBar(content: Text(orderProvider.errorMessage ?? 'Đặt hàng thất bại')),
         );
       }
     }
@@ -111,7 +118,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Checkout')),
+      appBar: AppBar(
+        title: const Text('Thanh toán'),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -119,75 +131,122 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildSectionTitle('Contact Information'),
+              _buildSectionTitle('Thông tin liên hệ'),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  prefixIcon: Icon(Icons.person_outline),
+                decoration: InputDecoration(
+                  labelText: 'Họ và tên',
+                  prefixIcon: const Icon(Icons.person_outline),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
-                validator: (val) => val == null || val.length < 2 ? 'Enter valid name' : null,
+                validator: (val) => val == null || val.length < 2 ? 'Nhập tên hợp lệ' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (val) => val == null || !val.contains('@') ? 'Enter valid email' : null,
+                validator: (val) => val == null || !val.contains('@') ? 'Nhập email hợp lệ' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  prefixIcon: Icon(Icons.phone_outlined),
+                decoration: InputDecoration(
+                  labelText: 'Số điện thoại',
+                  prefixIcon: const Icon(Icons.phone_outlined),
                   hintText: '09xxxxxxxx',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
                 keyboardType: TextInputType.phone,
                 validator: (val) {
-                  if (val == null || val.isEmpty) return 'Enter phone number';
-                  if (!RegExp(r'^(0\d{9,10})$').hasMatch(val)) return 'Invalid phone format (0xxxxxxxxx)';
+                  if (val == null || val.isEmpty) return 'Nhập số điện thoại';
+                  if (!RegExp(r'^(0\d{9,10})$').hasMatch(val)) return 'Số điện thoại không hợp lệ (0xxxxxxxxx)';
                   return null;
                 },
               ),
 
               const SizedBox(height: 24),
               
-              _buildSectionTitle('Shipping Address'),
+              _buildSectionTitle('Địa chỉ giao hàng'),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(
-                  labelText: 'Address',
-                  prefixIcon: Icon(Icons.location_on_outlined),
+                decoration: InputDecoration(
+                  labelText: 'Địa chỉ',
+                  prefixIcon: const Icon(Icons.location_on_outlined),
                   alignLabelWithHint: true,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
                 maxLines: 3,
-                validator: (val) => val == null || val.length < 10 ? 'Enter valid address (min 10 chars)' : null,
+                validator: (val) => val == null || val.length < 10 ? 'Nhập địa chỉ hợp lệ (tối thiểu 10 ký tự)' : null,
               ),
 
               const SizedBox(height: 24),
 
-              _buildSectionTitle('Payment Method'),
+              _buildSectionTitle('Phương thức thanh toán'),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _paymentMethod,
                     isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
                     items: const [
-                       DropdownMenuItem(value: 'cash', child: Text('Cash on Delivery')),
-                       DropdownMenuItem(value: 'credit_card', child: Text('Credit Card')),
-                       DropdownMenuItem(value: 'bank_transfer', child: Text('Bank Transfer')),
+                       DropdownMenuItem(value: 'cash', child: Row(
+                         children: [
+                           Icon(Icons.money, color: Colors.green),
+                           SizedBox(width: 12),
+                           Text('Thanh toán khi nhận hàng (COD)'),
+                         ],
+                       )),
+                       DropdownMenuItem(value: 'bank_transfer', child: Row(
+                         children: [
+                           Icon(Icons.account_balance, color: Colors.blue),
+                           SizedBox(width: 12),
+                           Text('Chuyển khoản ngân hàng (QR)'),
+                         ],
+                       )),
+                       DropdownMenuItem(value: 'e_wallet', child: Row(
+                         children: [
+                           Icon(Icons.account_balance_wallet, color: Colors.purple),
+                           SizedBox(width: 12),
+                           Text('Ví điện tử (Momo/ZaloPay)'),
+                         ],
+                       )),
+                       DropdownMenuItem(value: 'credit_card', child: Row(
+                         children: [
+                           Icon(Icons.credit_card, color: Colors.orange),
+                           SizedBox(width: 12),
+                           Text('Thẻ tín dụng/Ghi nợ'),
+                         ],
+                       )),
                     ],
                     onChanged: (val) {
                       if (val != null) setState(() => _paymentMethod = val);
@@ -198,7 +257,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               const SizedBox(height: 24),
 
-              _buildSectionTitle('Order Summary'),
+              _buildSectionTitle('Thông tin đơn hàng'),
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
@@ -217,8 +276,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           borderRadius: BorderRadius.circular(8),
                           image: item.product.image != null && item.product.image!.isNotEmpty
                            ? DecorationImage(
-                              image: NetworkImage(item.product.image!),
-                              fit: BoxFit.cover,
+                               image: NetworkImage(item.product.image!),
+                               fit: BoxFit.cover,
                              )
                            : null,
                         ),
@@ -232,14 +291,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                        padding: const EdgeInsets.all(16),
                        child: Column(
                          children: [
-                           _buildSummaryRow('Subtotal', subtotal),
+                           _buildSummaryRow('Tạm tính', subtotal),
                            const SizedBox(height: 8),
-                           _buildSummaryRow('Shipping', shipping),
+                           _buildSummaryRow('Phí vận chuyển', shipping),
                            const Divider(height: 24),
                            Row(
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
-                               const Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                               const Text('Tổng cộng', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                Text(total.formatPriceWithCurrency(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.primary)),
                              ],
                            )
@@ -263,7 +322,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   child: orderProvider.isLoading
                    ? const CircularProgressIndicator(color: Colors.white)
-                   : const Text('Place Order', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                   : const Text('Đặt hàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(height: 32),

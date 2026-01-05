@@ -1,6 +1,5 @@
 import '../../../../api/api_service.dart';
 import '../models/order_model.dart';
-import '../models/order_item_model.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/entities/order_item_entity.dart';
 import '../../domain/repositories/order_repository.dart';
@@ -34,8 +33,21 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
+  Future<List<Order>> getOrdersByUserId(int userId) async {
+    final models = await _apiService.getOrdersByUserId(userId);
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
+  Future<List<Order>> getOrdersByStatus(String status) async {
+    final models = await _apiService.getOrdersByStatus(status);
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
   Future<Order> createOrder(Order order) async {
     final modelOutput = await _apiService.createOrder(
+      userId: order.userId,
       customerName: order.customerName,
       email: order.email ?? '',
       phone: order.phone ?? '',

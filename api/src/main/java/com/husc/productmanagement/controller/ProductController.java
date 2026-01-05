@@ -69,4 +69,16 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
     }
+
+    @GetMapping("/featured")
+    public ResponseEntity<ApiResponse<List<ProductDTO>>> getFeaturedProducts() {
+        List<ProductDTO> products = productService.getFeaturedProducts();
+        return ResponseEntity.ok(ApiResponse.success(products));
+    }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<ApiResponse<List<ProductDTO>>> getLowStockProducts() {
+        List<ProductDTO> products = productService.getLowStockProducts();
+        return ResponseEntity.ok(ApiResponse.success(products));
+    }
 }

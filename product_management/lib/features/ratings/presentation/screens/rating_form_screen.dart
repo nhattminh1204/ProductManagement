@@ -4,7 +4,6 @@ import '../providers/rating_provider.dart';
 import '../../domain/entities/rating_entity.dart';
 import '../../../shared/design_system.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../../core/storage/local_storage.dart';
 
 class RatingFormScreen extends StatefulWidget {
   final int productId;
@@ -33,17 +32,17 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
 
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = context.read<AuthProvider>();
       final ratingProvider = context.read<RatingProvider>();
+      final authProvider = context.read<AuthProvider>();
       
-      // Get user ID from token or storage
-      final userInfo = await LocalStorage.getUserInfo();
-      final userId = int.tryParse(userInfo['id'] ?? '0') ?? 0;
+      // Get user ID from AuthProvider
+      final userId = authProvider.userId;
 
-      if (userId == 0) {
+      if (userId == null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please login to rate products'),
+            content: Text('Vui lòng đăng nhập để đánh giá'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -67,7 +66,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Rating submitted successfully'),
+            content: Text('Gửi đánh giá thành công'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -80,7 +79,10 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rate Product'),
+        title: const Text('Đánh giá sản phẩm'),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -104,7 +106,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                 ),
               const SizedBox(height: 24),
               const Text(
-                'Rating',
+                'Đánh giá',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -126,7 +128,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                 }),
               ),
               Text(
-                '$_rating out of 5 stars',
+                '$_rating trên 5 sao',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -138,10 +140,10 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
               TextFormField(
                 controller: _commentController,
                 decoration: const InputDecoration(
-                  labelText: 'Comment (Optional)',
+                  labelText: 'Nhận xét (Tùy chọn)',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.comment),
-                  hintText: 'Share your experience...',
+                  hintText: 'Chia sẻ trải nghiệm của bạn...',
                 ),
                 maxLines: 5,
               ),
@@ -161,7 +163,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text(
-                            'Submit Rating',
+                            'Gửi đánh giá',
                             style: TextStyle(fontSize: 16),
                           ),
                   );

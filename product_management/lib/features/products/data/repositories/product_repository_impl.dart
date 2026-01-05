@@ -38,6 +38,18 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
+  Future<List<Product>> getFeaturedProducts() async {
+    final models = await _apiService.getFeaturedProducts();
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
+  Future<List<Product>> getLowStockProducts() async {
+    final models = await _apiService.getLowStockProducts();
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
   Future<Product> createProduct(Product product) async {
     final modelInput = _toModel(product);
     final modelOutput = await _apiService.createProduct(modelInput);
@@ -68,6 +80,7 @@ class ProductRepositoryImpl implements ProductRepository {
       categoryName: model.categoryName,
       averageRating: model.averageRating,
       totalRatings: model.totalRatings,
+      description: model.description,
     );
   }
 
@@ -81,6 +94,7 @@ class ProductRepositoryImpl implements ProductRepository {
       status: entity.status,
       categoryId: entity.categoryId,
       categoryName: entity.categoryName,
+      description: entity.description,
     );
   }
 }

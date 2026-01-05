@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_management/features/shared/design_system.dart';
 import 'package:provider/provider.dart';
 import '../../domain/entities/product_entity.dart';
 import '../providers/product_provider.dart';
@@ -17,7 +18,7 @@ class ProductFormScreen extends StatefulWidget {
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _nameController;
   late TextEditingController _imageController;
   late TextEditingController _priceController;
@@ -32,7 +33,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _nameController = TextEditingController(text: p?.name ?? '');
     _imageController = TextEditingController(text: p?.image ?? '');
     _priceController = TextEditingController(text: p?.price.toString() ?? '');
-    _quantityController = TextEditingController(text: p?.quantity.toString() ?? '');
+    _quantityController = TextEditingController(
+      text: p?.quantity.toString() ?? '',
+    );
     _isActive = p?.status == 'active' ? true : (p == null ? true : false);
     _selectedCategoryId = p?.categoryId;
 
@@ -42,7 +45,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       if (!authProvider.isAdmin) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Access Denied: Admin privileges required.'),
+            content: Text('Từ chối truy cập: Yêu cầu quyền Admin.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -67,8 +70,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void _submit() async {
     if (_formKey.currentState!.validate()) {
-       if (_selectedCategoryId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a category')));
+      if (_selectedCategoryId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Vui lòng chọn danh mục')),
+        );
         return;
       }
 
@@ -93,11 +98,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       if (success && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(widget.product == null ? 'Added successfully' : 'Updated successfully')),
+          SnackBar(
+            content: Text(
+              widget.product == null
+                  ? 'Thêm thành công'
+                  : 'Cập nhật thành công',
+            ),
+          ),
         );
       } else if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(provider.errorMessage ?? 'Operation failed')),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(provider.errorMessage ?? 'Thao tác thất bại')),
         );
       }
     }
@@ -110,83 +121,90 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Product' : 'Add Product'),
+        title: Text(isEditing ? 'Sửa sản phẩm' : 'Thêm sản phẩm'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-             crossAxisAlignment: CrossAxisAlignment.stretch,
-             children: [
-               TextFormField(
-                 controller: _nameController,
-                 decoration: const InputDecoration(labelText: 'Product Name'),
-                 validator: (val) => val!.isEmpty ? 'Enter name' : null,
-               ),
-               const SizedBox(height: 16),
-               TextFormField(
-                 controller: _imageController,
-                 decoration: const InputDecoration(labelText: 'Image URL'),
-               ),
-               const SizedBox(height: 16),
-               Row(
-                 children: [
-                   Expanded(
-                     child: TextFormField(
-                       controller: _priceController,
-                       decoration: const InputDecoration(labelText: 'Price'),
-                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                       validator: (val) => val!.isEmpty ? 'Enter price' : null,
-                     ),
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: TextFormField(
-                       controller: _quantityController,
-                       decoration: const InputDecoration(labelText: 'Quantity'),
-                       keyboardType: TextInputType.number,
-                       validator: (val) => val!.isEmpty ? 'Enter quantity' : null,
-                     ),
-                   ),
-                 ],
-               ),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
+                validator: (val) => val!.isEmpty ? 'Nhập tên' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _imageController,
+                decoration: const InputDecoration(labelText: 'URL Hình ảnh'),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _priceController,
+                      decoration: const InputDecoration(labelText: 'Giá'),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: (val) => val!.isEmpty ? 'Nhập giá' : null,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _quantityController,
+                      decoration: const InputDecoration(labelText: 'Số lượng'),
+                      keyboardType: TextInputType.number,
+                      validator: (val) =>
+                          val!.isEmpty ? 'Nhập số lượng' : null,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
-                value: _selectedCategoryId,
-                decoration: const InputDecoration(labelText: 'Category'),
-                 items: categoryProvider.categories.map((c) {
-                    return DropdownMenuItem(value: c.id, child: Text(c.name));
-                 }).toList(),
-                 onChanged: (val) => setState(() => _selectedCategoryId = val),
-                 hint: categoryProvider.isLoading 
-                    ? const Text('Loading categories...') 
-                    : const Text('Select Category'),
-               ),
-                const SizedBox(height: 16),
-                 SwitchListTile(
-                  title: const Text('Active Status'),
-                  value: _isActive,
-                  onChanged: (val) => setState(() => _isActive = val),
-                ),
-                const SizedBox(height: 30),
-                Consumer<ProductProvider>(
-                  builder: (context, provider, _) {
-                    return ElevatedButton(
-                      onPressed: provider.isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: Text(isEditing ? 'Update Product' : 'Create Product'),
-                    );
-                  },
-                ),
-             ],
+                initialValue: _selectedCategoryId,
+                decoration: const InputDecoration(labelText: 'Danh mục'),
+                items: categoryProvider.categories.map((c) {
+                  return DropdownMenuItem(value: c.id, child: Text(c.name));
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedCategoryId = val),
+                 hint: categoryProvider.isLoading
+                    ? const Text('Đang tải danh mục...')
+                    : const Text('Chọn danh mục'),
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text('Trạng thái hoạt động'),
+                value: _isActive,
+                onChanged: (val) => setState(() => _isActive = val),
+              ),
+              const SizedBox(height: 30),
+              Consumer<ProductProvider>(
+                builder: (context, provider, _) {
+                  return ElevatedButton(
+                    onPressed: provider.isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text(
+                      isEditing ? 'Cập nhật' : 'Tạo mới',
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-
-

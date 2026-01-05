@@ -1,8 +1,8 @@
 import 'package:product_management/product_management/domain/entities/entities.dart';
 
 abstract class AuthRepository {
-  Future<String> login(String email, String password);
-  Future<void> register(String name, String email, String phone, String password);
+  Future<String> login(String usernameOrEmail, String password);
+  Future<void> register(String name, String username, String email, String phone, String password);
 }
 
 abstract class ProductRepository {
