@@ -49,6 +49,19 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success(products));
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<List<ProductDTO>>> filterProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) String sortBy) {
+        List<ProductDTO> products = productService.filterProducts(keyword, categoryId, minPrice, maxPrice, minRating,
+                sortBy);
+        return ResponseEntity.ok(ApiResponse.success(products));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         ProductDTO createdProduct = productService.createProduct(productDTO);

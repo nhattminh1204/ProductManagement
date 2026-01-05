@@ -162,8 +162,8 @@ public class OrderService {
         order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
 
-        // If order status is PAID, update payment status to PAID
-        if (newStatus == Order.Status.PAID) {
+        // If order status is PAID or DELIVERED, update payment status to PAID
+        if (newStatus == Order.Status.PAID || newStatus == Order.Status.DELIVERED) {
             try {
                 List<PaymentDTO> paymentsForOrder = paymentService.getPaymentsByOrderId(id);
                 for (PaymentDTO paymentDTO : paymentsForOrder) {

@@ -56,6 +56,53 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductDTO> filterProducts(String keyword, Integer categoryId, java.math.BigDecimal minPrice,
+            java.math.BigDecimal maxPrice, Double minRating, String sortBy) {
+
+        List<Product> products = productRepository.findWithFilters(keyword, categoryId, minPrice, maxPrice);
+
+        // Filter by status ACTIVE
+        List<ProductDTO> dtos = products.stream()
+                .filter(p -> p.getStatus() == Product.Status.ACTIVE)
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        // Filter by rating if provided
+        if (minRating != null) {
+            dtos = dtos.stream()
+                    .filter(p -> p.getAverageRating() != null && p.getAverageRating() >= minRating)
+                    .collect(Collectors.toList());
+        }
+
+        // Sort
+        if (sortBy != null) {
+            switch (sortBy.toLowerCase()) {
+                case "price_asc":
+                    dtos.sort((p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
+                    break;
+                case "price_desc":
+                    dtos.sort((p1, p2) -> p2.getPrice().compareTo(p1.getPrice()));
+                    break;
+                case "rating":
+                    dtos.sort((p1, p2) -> {
+                        Double r1 = p1.getAverageRating() != null ? p1.getAverageRating() : 0.0;
+                        Double r2 = p2.getAverageRating() != null ? p2.getAverageRating() : 0.0;
+                        return r2.compareTo(r1); // Descending
+                    });
+                    break;
+                case "newest":
+                    // Assuming ID is proxy for newness, or we could add createdAt to DTO
+                    dtos.sort((p1, p2) -> p2.getId().compareTo(p1.getId()));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return dtos;
+    }
+
     @Transactional
     public ProductDTO createProduct(ProductDTO productDTO) {
         Category category = categoryRepository.findById(productDTO.getCategoryId())

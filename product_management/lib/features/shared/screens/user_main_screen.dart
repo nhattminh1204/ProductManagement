@@ -9,6 +9,7 @@ import '../../orders/presentation/screens/user_order_history_screen.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 import '../../users/presentation/screens/edit_profile_screen.dart';
 import '../../wishlist/presentation/screens/wishlist_screen.dart';
+import '../../addresses/presentation/screens/user_address_list_screen.dart';
 import '../widgets/app_drawer.dart';
 import '../design_system.dart';
 import '../../../api/api_service.dart';
@@ -255,19 +256,33 @@ class _UserProfileTabState extends State<UserProfileTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    _buildProfileItem(
-                      icon: Icons.history_rounded,
-                      color: Colors.blue,
-                      title: 'Lịch sử đơn hàng',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const UserOrderHistoryScreen(),
-                          ),
-                        );
-                      },
-                    ),
+                      _buildProfileItem(
+                        icon: Icons.history_rounded,
+                        color: Colors.blue,
+                        title: 'Lịch sử đơn hàng',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const UserOrderHistoryScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildProfileItem(
+                        icon: Icons.location_on_rounded,
+                        color: Colors.teal,
+                        title: 'Sổ địa chỉ',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const UserAddressListScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     const SizedBox(height: 16),
                     _buildProfileItem(
                       icon: Icons.edit_rounded,

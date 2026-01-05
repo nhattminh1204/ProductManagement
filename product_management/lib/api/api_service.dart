@@ -9,6 +9,7 @@ import '../product_management/data/models/cart_item_model.dart';
 import '../features/wishlist/data/models/wishlist_model.dart';
 import '../features/inventory/data/models/inventory_log_model.dart';
 import '../features/payments/data/models/payment_model.dart';
+import '../features/addresses/data/models/user_address_model.dart';
 
 import '../core/config/app_config.dart';
 
@@ -136,6 +137,36 @@ class ApiService {
       final response = await _dio.get(
         '/products/search',
         queryParameters: {'keyword': keyword},
+      );
+      final data = response.data['data'] as List;
+      return data.map((e) => ProductModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<ProductModel>> filterProducts({
+    String? keyword,
+    int? categoryId,
+    double? minPrice,
+    double? maxPrice,
+    double? minRating,
+    String? sortBy,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (keyword != null && keyword.isNotEmpty)
+        queryParams['keyword'] = keyword;
+      if (categoryId != null) queryParams['categoryId'] = categoryId;
+      if (minPrice != null) queryParams['minPrice'] = minPrice;
+      if (maxPrice != null) queryParams['maxPrice'] = maxPrice;
+      if (minRating != null) queryParams['minRating'] = minRating;
+      if (sortBy != null && sortBy.isNotEmpty) queryParams['sortBy'] = sortBy;
+
+      final response = await _dio.get(
+        '/products/filter',
+        queryParameters: queryParams,
       );
       final data = response.data['data'] as List;
       return data.map((e) => ProductModel.fromJson(e)).toList();
@@ -449,6 +480,47 @@ class ApiService {
     }
   }
 
+  // --- Addresses ---
+  Future<List<UserAddressModel>> getUserAddresses(int userId) async {
+    try {
+      final response = await _dio.get('/user-addresses/user/$userId');
+      final data = response.data['data'] as List;
+      return data.map((e) => UserAddressModel.fromJson(e)).toList();
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<UserAddressModel> createAddress(UserAddressModel address) async {
+    try {
+      final response = await _dio.post('/user-addresses', data: address.toJson());
+      return UserAddressModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<UserAddressModel> updateAddress(int id, UserAddressModel address) async {
+    try {
+      final response = await _dio.put('/user-addresses/$id', data: address.toJson());
+      return UserAddressModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAddress(int id) async {
+    try {
+      await _dio.delete('/user-addresses/$id');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
   Future<void> changePassword(
       int userId, String oldPassword, String newPassword) async {
     try {
@@ -499,6 +571,17 @@ class ApiService {
   Future<void> deleteRating(int id) async {
     try {
       await _dio.delete('/ratings/$id');
+    } catch (e) {
+      if (e is DioException) throw Exception(_parseError(e));
+      rethrow;
+    }
+  }
+
+  Future<List<RatingModel>> getAllRatings() async {
+    try {
+      final response = await _dio.get('/ratings');
+      final data = response.data['data'] as List;
+      return data.map((e) => RatingModel.fromJson(e)).toList();
     } catch (e) {
       if (e is DioException) throw Exception(_parseError(e));
       rethrow;

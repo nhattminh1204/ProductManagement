@@ -5,6 +5,8 @@ import 'package:product_management/features/products/presentation/screens/admin_
 import 'package:product_management/features/orders/presentation/screens/order_list_screen.dart';
 import 'package:product_management/features/users/presentation/screens/user_management_screen.dart';
 import 'package:product_management/features/categories/presentation/screens/category_management_screen.dart';
+import '../../../../features/ratings/presentation/screens/admin_rating_management_screen.dart';
+import '../../../../features/payments/presentation/screens/admin_payment_management_screen.dart';
 import 'package:product_management/features/auth/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:product_management/features/auth/presentation/screens/login_screen.dart';
@@ -75,6 +77,20 @@ class AdminDrawer extends StatelessWidget {
                   icon: Icons.people,
                   title: 'Quản lý người dùng',
                   onTap: () => _navigate(context, const UserManagementScreen()),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.star_rate,
+                  title: 'Quản lý đánh giá',
+                  onTap: () =>
+                      _navigate(context, const AdminRatingManagementScreen()),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.payment,
+                  title: 'Quản lý thanh toán',
+                  onTap: () =>
+                      _navigate(context, const AdminPaymentManagementScreen()),
                 ),
                 const Divider(),
                 _buildDrawerItem(

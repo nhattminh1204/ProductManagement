@@ -6,6 +6,14 @@ abstract class ProductRepository {
   Future<Product> getProductById(int id);
   Future<List<Product>> getProductsByCategory(int categoryId);
   Future<List<Product>> searchProducts(String keyword);
+  Future<List<Product>> filterProducts({
+    String? keyword,
+    int? categoryId,
+    double? minPrice,
+    double? maxPrice,
+    double? minRating,
+    String? sortBy,
+  });
   Future<List<Product>> getFeaturedProducts();
   Future<List<Product>> getLowStockProducts();
   Future<Product> createProduct(Product product);

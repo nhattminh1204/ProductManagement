@@ -1,842 +1,270 @@
 ---
-name: Product Management App Comprehensive Improvement Plan
-overview: Kế hoạch cải thiện toàn diện ứng dụng Product Management, phát triển song song tính năng User và Admin, bao gồm 6 phases từ Foundation & Security đến Advanced Features và Optimization.
+name: Kế hoạch Cải thiện Toàn diện Ứng dụng Quản lý Sản phẩm
+overview: Kế hoạch tập trung vào phát triển chức năng và giao diện người dùng (UI/UX) cho cả User và Admin, bỏ qua các yếu tố bảo mật phức tạp, nhằm nhanh chóng hoàn thiện sản phẩm.
 todos:
-  - id: phase0-jwt-filter
-    content: Implement JWT Authentication Filter in backend
-    status: pending
-  - id: phase0-rbac
-    content: Implement Role-Based Authorization with @PreAuthorize annotations
-    status: pending
-    dependencies:
-      - phase0-jwt-filter
-  - id: phase0-validation
-    content: Enhance input validation in both frontend and backend
-    status: pending
-  - id: phase0-error-handling
-    content: Improve error handling with consistent error messages
-    status: pending
   - id: phase1-ratings
-    content: Build Product Rating & Review System UI
+    content: Xây dựng hệ thống Đánh giá & Bình luận sản phẩm (Ratings & Reviews)
     status: pending
-    dependencies:
-      - phase0-rbac
   - id: phase1-search-filter
-    content: Implement Advanced Product Search & Filter
-    status: pending
+    content: Triển khai Tìm kiếm & Bộ lọc nâng cao (Theo giá, danh mục, đánh giá)
+    status: completed
   - id: phase1-address
-    content: Create Address Management System
-    status: pending
+    content: Hệ thống Quản lý địa chỉ giao hàng (Thêm, sửa, xóa, chọn mặc định)
+    status: completed
   - id: phase1-order-tracking
-    content: Build Order Status Tracking & Notifications
+    content: Theo dõi trạng thái đơn hàng (Timeline trực quan)
     status: pending
   - id: phase1-cart-enhance
-    content: Enhance Cart Features with stock validation
+    content: Cải tiến Giỏ hàng (Kiểm tra tồn kho, cảnh báo hết hàng)
     status: pending
   - id: phase2-user-management
-    content: Build User Management System for Admin
+    content: Quản lý Người dùng cho Admin (Danh sách, chi tiết, khóa tài khoản)
     status: pending
-    dependencies:
-      - phase0-rbac
   - id: phase2-order-management
-    content: Enhance Order Management with filters and bulk actions
+    content: Quản lý Đơn hàng nâng cao cho Admin (Lọc, in hóa đơn, cập nhật hàng loạt)
     status: pending
   - id: phase2-product-management
-    content: Improve Product Management with bulk operations
+    content: Quản lý Sản phẩm nâng cao (Nhiều ảnh, biến thể, xóa hàng loạt)
     status: pending
   - id: phase2-dashboard-analytics
-    content: Add Advanced Dashboard Analytics
+    content: Dashboard & Thống kê doanh thu, khách hàng
     status: pending
   - id: phase2-inventory
-    content: Enhance Inventory Management with alerts
+    content: Quản lý Kho hàng (Cảnh báo sắp hết hàng, lịch sử nhập xuất)
     status: pending
   - id: phase3-payment
-    content: Integrate Payment Gateways
+    content: Tích hợp Thanh toán (Mô phỏng cổng thanh toán, lịch sử giao dịch)
     status: pending
     dependencies:
       - phase1-address
   - id: phase3-coupon
-    content: Build Coupon & Promotion System for Users
+    content: Hệ thống Mã giảm giá (Coupon) cho người dùng
     status: pending
   - id: phase3-comparison
-    content: Implement Product Comparison Feature
+    content: Tính năng So sánh sản phẩm
     status: pending
   - id: phase3-view-history
-    content: Add View History & Recently Viewed
+    content: Lịch sử xem hàng & Sản phẩm đã xem gần đây
     status: pending
   - id: phase3-sharing
-    content: Implement Social Sharing
+    content: Chia sẻ sản phẩm qua Mạng xã hội
     status: pending
   - id: phase3-support
-    content: Build Help & Support Center
+    content: Trung tâm Hỗ trợ & FAQ
     status: pending
   - id: phase4-promotion-admin
-    content: Create Promotion Management for Admin
+    content: Quản lý Khuyến mãi & Coupon cho Admin
     status: pending
     dependencies:
       - phase3-coupon
   - id: phase4-rating-admin
-    content: Build Rating & Review Management for Admin
+    content: Quản lý Đánh giá & Bình luận cho Admin
     status: pending
     dependencies:
       - phase1-ratings
   - id: phase4-payment-admin
-    content: Create Payment Management for Admin
+    content: Quản lý Giao dịch & Thanh toán cho Admin
     status: pending
     dependencies:
       - phase3-payment
   - id: phase4-category-enhance
-    content: Enhance Category Management with subcategories
+    content: Quản lý Danh mục nâng cao (Danh mục con - Subcategories)
     status: pending
   - id: phase4-settings
-    content: Build System Settings Management
+    content: Cài đặt hệ thống
     status: pending
   - id: phase4-reporting
-    content: Add Advanced Reporting Features
+    content: Báo cáo & Phân tích chuyên sâu
     status: pending
     dependencies:
       - phase2-dashboard-analytics
   - id: phase5-dark-mode
-    content: Implement Dark Mode
+    content: Giao diện Tối (Dark Mode)
     status: pending
   - id: phase5-localization
-    content: Add Multi-language Support
+    content: Đa ngôn ngữ (Tiếng Việt / Tiếng Anh)
     status: pending
   - id: phase5-performance
-    content: Optimize Performance with pagination and caching
+    content: Tối ưu hiệu năng (Lazy loading, caching)
     status: pending
   - id: phase5-offline
-    content: Implement Offline Support
+    content: Hỗ trợ Offline (Xem sản phẩm đã cache)
     status: pending
   - id: phase5-push-notifications
-    content: Integrate Push Notifications
+    content: Thông báo đẩy (Push Notifications) cho trạng thái đơn hàng
     status: pending
   - id: phase5-image-upload
-    content: Build Image Upload & Management System
+    content: Quản lý & Upload hình ảnh chuyên nghiệp
     status: pending
   - id: phase5-profile-enhance
-    content: Enhance User Profile with avatar and password change
-    status: pending
-  - id: phase5-testing
-    content: Write Tests and Fix Bugs
+    content: Hoàn thiện Hồ sơ người dùng (Avatar, thông tin chi tiết)
     status: pending
 ---
 
-#Product Management App - Comprehensive Improvement Plan
+# Kế hoạch Cải thiện Toàn diện Ứng dụng Quản lý Sản phẩm
 
 ## Tổng quan
 
-Plan này chia thành 6 phases, phát triển song song tính năng User và Admin, từ nền tảng bảo mật đến các tính năng nâng cao.
-
-## Phase 0: Foundation & Security (CRITICAL - Ưu tiên cao nhất)
-
-### Mục tiêu
-
-Xây dựng nền tảng bảo mật vững chắc, đảm bảo ứng dụng an toàn trước khi phát triển tính năng mới.
-
-### Tasks
-
-#### Task 0.1: Implement JWT Authentication Filter
-
-**Files:**
-
-- `api/src/main/java/com/husc/productmanagement/config/JwtAuthenticationFilter.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/config/SecurityConfig.java` (UPDATE)
-
-**Implementation:**
-
-- Tạo JwtAuthenticationFilter extends OncePerRequestFilter
-- Extract JWT token từ Authorization header
-- Validate token sử dụng JwtUtil
-- Extract user info và role từ token
-- Set authentication vào SecurityContext
-- Handle token expiration và invalid tokens
-- Update SecurityConfig để thêm filter vào chain
-
-#### Task 0.2: Implement Role-Based Authorization
-
-**Files:**
-
-- `api/src/main/java/com/husc/productmanagement/config/SecurityConfig.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/ProductController.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/CategoryController.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/OrderController.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/UserController.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/DashboardController.java` (UPDATE)
-
-**Implementation:**
-
-- Enable method security: `@EnableMethodSecurity` trong SecurityConfig
-- Update SecurityConfig: Remove `.permitAll()` cho protected endpoints
-- Protect admin endpoints với `@PreAuthorize("hasRole('ADMIN')")`:
-- ProductController: createProduct, updateProduct, deleteProduct
-- CategoryController: createCategory, updateCategory, deleteCategory
-- OrderController: updateOrderStatus
-- UserController: getAllUsers, deleteUser
-- DashboardController: all endpoints (admin only)
-- Allow both roles cho user-accessible endpoints: `@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")`
-- Keep public: `/api/auth/**`, GET `/api/products`, GET `/api/categories`
-
-#### Task 0.3: Enhance Input Validation
-
-**Files:**
-
-- `api/src/main/java/com/husc/productmanagement/dto/ProductDTO.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/dto/CategoryDTO.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/dto/OrderDTO.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/dto/UserDTO.java` (UPDATE)
-- `product_management/lib/features/orders/presentation/screens/checkout_screen.dart` (UPDATE)
-- `product_management/lib/features/products/presentation/screens/product_form_screen.dart` (UPDATE)
-
-**Implementation:**
-
-- Backend: Add `@NotNull`, `@NotBlank`, `@Min`, `@Max`, `@Email`, `@Pattern` annotations
-- Frontend: Enhance form validation
-- Email: Use EmailValidator hoặc regex
-- Phone: Vietnamese format validation (0xxxxxxxxx)
-- Price: Must be > 0
-- Quantity: Must be > 0, integer
-- Show validation errors clearly
-- Disable submit button if form invalid
-
-#### Task 0.4: Improve Error Handling
-
-**Files:**
-
-- `api/src/main/java/com/husc/productmanagement/exception/GlobalExceptionHandler.java` (UPDATE)
-- `product_management/lib/core/utils/error_messages.dart` (NEW)
-- `product_management/lib/api/api_service.dart` (UPDATE)
-
-**Implementation:**
-
-- Backend: Add specific exception handlers (UnauthorizedException, ForbiddenException, etc.)
-- Frontend: Create ErrorMessages constants class
-- Update ApiService error parsing với consistent messages
-- Add user-friendly error messages cho tất cả API calls
+Kế hoạch này được điều chỉnh để tập trung tối đa vào **Tính năng (Functionality)** và **Giao diện (UI/UX)**, loại bỏ các rào cản về bảo mật phức tạp ở giai đoạn này. Mục tiêu là tạo ra một ứng dụng hoàn chỉnh, đẹp mắt và giàu tính năng.
 
 ---
 
-## Phase 1: Core User Features (Essential)
+## Phase 1: Tính năng User Cốt lõi (Trải nghiệm Mua sắm)
 
-### Mục tiêu
-
-Hoàn thiện trải nghiệm mua sắm cơ bản cho người dùng.
+**Mục tiêu:** Người dùng có thể tìm kiếm, xem, đánh giá và mua hàng một cách mượt mà nhất.
 
 ### Tasks
 
-#### Task 1.1: Product Rating & Review System
+#### Task 1.1: Đánh giá & Bình luận (Ratings & Reviews)
 
-**Files:**
+- **UI:** Thêm sao đánh giá (1-5) và form bình luận trong chi tiết sản phẩm.
+- **Feature:** Hiển thị trung bình sao, tổng số đánh giá. User có thể viết review (có thể kèm ảnh).
 
-- `product_management/lib/features/ratings/presentation/screens/product_rating_screen.dart` (NEW)
-- `product_management/lib/features/ratings/presentation/screens/rating_list_screen.dart` (NEW)
-- `product_management/lib/features/products/presentation/screens/product_detail_screen.dart` (UPDATE)
-- `product_management/lib/features/products/presentation/widgets/rating_widget.dart` (NEW)
-- `product_management/lib/features/ratings/presentation/widgets/rating_form_widget.dart` (NEW)
+#### Task 1.2: Tìm kiếm & Lọc nâng cao (Advanced Search & Filter)
 
-**Implementation:**
+- **UI:** Màn hình lọc riêng hoặc BottomSheet.
+- **Feature:** Lọc theo: Khoảng giá, Danh mục, Đánh giá (4 sao+), Sắp xếp (Giá tăng/giảm, Mới nhất).
 
-- Create ProductRatingScreen: Hiển thị danh sách đánh giá, form tạo đánh giá
-- Create RatingListScreen: Danh sách đánh giá với filter (all, 5-star, 4-star, etc.)
-- Update ProductDetailScreen: Thêm section hiển thị ratings, link đến rating screen
-- Create RatingWidget: Hiển thị stars, average rating, total reviews
-- Create RatingFormWidget: Form tạo đánh giá (rating 1-5, comment, optional image)
-- Integrate với RatingProvider
+#### Task 1.3: Quản lý Địa chỉ Giao hàng
 
-#### Task 1.2: Advanced Product Search & Filter
+- **UI:** Màn hình danh sách địa chỉ đẹp mắt.
+- **Feature:** Thêm mới, Sửa, Xóa địa chỉ. Chọn địa chỉ mặc định để tự động điền khi Checkout.
 
-**Files:**
+#### Task 1.4: Theo dõi Đơn hàng (Order Tracking Timeline)
 
-- `product_management/lib/features/products/presentation/screens/product_filter_screen.dart` (NEW)
-- `product_management/lib/features/products/presentation/screens/user_product_list_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/ProductController.java` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/service/ProductService.java` (UPDATE)
+- **UI:** Timeline dọc hoặc ngang thể hiện trạng thái: Chờ duyệt -> Đã duyệt -> Đang giao -> Đã giao.
+- **Feature:** Cập nhật trạng thái realtime (khi Admin đổi trạng thái). Nút "Đã nhận hàng" cho User.
 
-**Implementation:**
+#### Task 1.5: Cải tiến Giỏ hàng (Smart Cart)
 
-- Create ProductFilterScreen: Filter dialog với options:
-- Price range (slider)
-- Category (multi-select)
-- Rating (4+, 3+, etc.)
-- Sort options (price low-high, price high-low, rating, newest)
-- Update UserProductListScreen: Thêm filter button, apply filters
-- Backend: Add filter endpoints:
-- `/api/products/filter?minPrice=&maxPrice=&categoryId=&minRating=&sortBy=`
-- Update ProductService với filter logic
-
-#### Task 1.3: Address Management
-
-**Files:**
-
-- `product_management/lib/features/users/presentation/screens/address_list_screen.dart` (NEW)
-- `product_management/lib/features/users/presentation/screens/address_form_screen.dart` (NEW)
-- `product_management/lib/features/orders/presentation/screens/checkout_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/entity/Address.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/AddressController.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/service/AddressService.java` (NEW)
-
-**Implementation:**
-
-- Create Address entity với fields: userId, name, phone, address, isDefault
-- Create AddressController với CRUD endpoints
-- Create AddressListScreen: Danh sách địa chỉ, set default, edit, delete
-- Create AddressFormScreen: Form thêm/sửa địa chỉ
-- Update CheckoutScreen: Dropdown chọn địa chỉ đã lưu, option thêm địa chỉ mới
-
-#### Task 1.4: Order Status Tracking & Notifications
-
-**Files:**
-
-- `product_management/lib/features/orders/presentation/screens/order_tracking_screen.dart` (NEW)
-- `product_management/lib/features/orders/presentation/screens/user_order_history_screen.dart` (UPDATE)
-- `product_management/lib/features/orders/presentation/widgets/order_status_timeline.dart` (NEW)
-- `product_management/lib/core/services/notification_service.dart` (NEW)
-
-**Implementation:**
-
-- Create OrderTrackingScreen: Timeline hiển thị trạng thái đơn hàng
-- Create OrderStatusTimeline widget: Visual timeline với icons
-- Update UserOrderHistoryScreen: Thêm tracking button, real-time status updates
-- Create NotificationService: Local notifications cho order status changes
-- Backend: Add order status history tracking trong Order entity
-
-#### Task 1.5: Enhanced Cart Features
-
-**Files:**
-
-- `product_management/lib/features/orders/presentation/screens/cart_screen.dart` (UPDATE)
-- `product_management/lib/features/orders/presentation/providers/cart_provider.dart` (UPDATE)
-
-**Implementation:**
-
-- Add stock validation: Check quantity before add to cart, show warning if low stock
-- Add save cart to backend: Sync cart với server
-- Add cart persistence: Save cart locally, restore on app restart
-- Show out-of-stock warnings
-- Update quantity validation: Prevent negative or zero quantities
+- **Feature:** Tự động kiểm tra tồn kho khi thêm vào giỏ. Hiển thị cảnh báo nếu số lượng mua > tồn kho. Tính tổng tiền real-time.
 
 ---
 
-## Phase 2: Core Admin Features (Essential)
+## Phase 2: Tính năng Admin Cốt lõi (Quản trị Hệ thống)
 
-### Mục tiêu
-
-Hoàn thiện công cụ quản lý cơ bản cho admin.
+**Mục tiêu:** Cung cấp công cụ mạnh mẽ để Admin quản lý vận hành.
 
 ### Tasks
 
-#### Task 2.1: User Management System
+#### Task 2.1: Quản lý Người dùng
 
-**Files:**
+- **UI:** Danh sách User dạng bảng hoặc list card.
+- **Feature:** Xem chi tiết lịch sử mua hàng của user. Khóa/Mở khóa tài khoản.
 
-- `product_management/lib/features/users/presentation/screens/admin_user_list_screen.dart` (NEW)
-- `product_management/lib/features/users/presentation/screens/admin_user_detail_screen.dart` (NEW)
-- `product_management/lib/features/shared/screens/admin_dashboard_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/UserController.java` (UPDATE)
+#### Task 2.2: Quản lý Đơn hàng Nâng cao
 
-**Implementation:**
+- **Feature:** 
+- Bộ lọc đơn hàng (Theo trạng thái, ngày tháng).
+- Thao tác nhanh: Duyệt nhanh, Hủy nhanh.
+- In hóa đơn (xuất PDF đơn giản).
+- Ghi chú nội bộ cho đơn hàng.
 
-- Create AdminUserListScreen: 
-- List users với search, filter (role, status)
-- Actions: View detail, activate/deactivate, delete
-- Create AdminUserDetailScreen:
-- User info, order history, statistics
-- Actions: Edit, change role, activate/deactivate
-- Update AdminDashboardScreen: Thêm Users tab
-- Backend: Add user search, filter endpoints
+#### Task 2.3: Quản lý Sản phẩm Nâng cao
 
-#### Task 2.2: Advanced Order Management
+- **UI:** Form nhập liệu chuyên nghiệp hơn.
+- **Feature:**
+- Upload nhiều ảnh cho 1 sản phẩm (Slider ảnh).
+- Xóa/Ẩn sản phẩm nhanh.
+- Quản lý biến thể (Màu sắc, Size) nếu cần thiết.
 
-**Files:**
+#### Task 2.4: Dashboard & Thống kê (Analytics)
 
-- `product_management/lib/features/orders/presentation/screens/order_list_screen.dart` (UPDATE)
-- `product_management/lib/features/orders/presentation/screens/order_detail_screen.dart` (UPDATE)
-- `product_management/lib/features/orders/presentation/widgets/order_filter_dialog.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/OrderController.java` (UPDATE)
+- **UI:** Biểu đồ đường (doanh thu), biểu đồ tròn (tỷ lệ đơn hàng).
+- **Feature:**
+- Thống kê doanh thu theo ngày/tuần/tháng.
+- Top sản phẩm bán chạy.
+- Số lượng khách hàng mới.
 
-**Implementation:**
+#### Task 2.5: Quản lý Kho hàng (Inventory)
 
-- Create OrderFilterDialog: Filter by date range, status, customer, amount range
-- Update OrderListScreen: 
-- Add filter button, search bar
-- Bulk actions (update multiple orders)
-- Export to CSV/Excel
-- Update OrderDetailScreen:
-- Add notes field
-- Status change history
-- Print invoice button
-- Backend: Add filter, search, export endpoints
-
-#### Task 2.3: Enhanced Product Management
-
-**Files:**
-
-- `product_management/lib/features/products/presentation/screens/admin_product_list_screen.dart` (UPDATE)
-- `product_management/lib/features/products/presentation/screens/product_form_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/controller/ProductController.java` (UPDATE)
-
-**Implementation:**
-
-- Update AdminProductListScreen:
-- Bulk edit/delete
-- Duplicate product
-- Import/Export CSV
-- Advanced filters
-- Update ProductFormScreen:
-- Multiple image upload
-- Product variants (size, color) - optional
-- SEO fields (meta title, description)
-- Backend: Add bulk operations, import/export endpoints
-
-#### Task 2.4: Advanced Dashboard Analytics
-
-**Files:**
-
-- `product_management/lib/features/dashboard/presentation/screens/dashboard_overview_screen.dart` (UPDATE)
-- `product_management/lib/features/dashboard/presentation/screens/revenue_report_screen.dart` (NEW)
-- `product_management/lib/features/dashboard/presentation/screens/customer_analytics_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/DashboardController.java` (UPDATE)
-
-**Implementation:**
-
-- Create RevenueReportScreen: 
-- Revenue by product, category
-- Date range comparison
-- Export PDF/Excel
-- Create CustomerAnalyticsScreen:
-- Customer segmentation (RFM analysis)
-- New vs returning customers
-- Customer lifetime value
-- Update DashboardOverviewScreen: Add links to detailed reports
-- Backend: Add analytics endpoints
-
-#### Task 2.5: Inventory Management Enhancements
-
-**Files:**
-
-- `product_management/lib/features/inventory/presentation/screens/inventory_logs_screen.dart` (UPDATE)
-- `product_management/lib/features/inventory/presentation/screens/low_stock_alert_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/InventoryController.java` (UPDATE)
-
-**Implementation:**
-
-- Create LowStockAlertScreen: List products với quantity <= threshold
-- Update InventoryLogsScreen:
-- Filter by product, date, type
-- Export reports
-- Backend: Add low stock alerts, inventory reports
+- **Feature:**
+- Cảnh báo các sản phẩm sắp hết hàng (Low stock alert).
+- Lịch sử nhập/xuất kho (đơn giản).
 
 ---
 
-## Phase 3: Advanced User Features
+## Phase 3: Tính năng User Nâng cao (Tăng tương tác)
 
-### Mục tiêu
-
-Nâng cao trải nghiệm người dùng với tính năng nâng cao.
+**Mục tiêu:** Giữ chân người dùng và khuyến khích mua hàng nhiều hơn.
 
 ### Tasks
 
-#### Task 3.1: Payment Integration
+#### Task 3.1: Tích hợp Thanh toán (Payment)
 
-**Files:**
+- **Feature:** 
+- Giao diện chọn phương thức thanh toán (Visa, Momo, COD).
+- Mô phỏng quá trình thanh toán thành công/thất bại.
+- Lưu lịch sử giao dịch.
 
-- `product_management/lib/features/payments/presentation/screens/payment_methods_screen.dart` (NEW)
-- `product_management/lib/features/payments/presentation/screens/payment_history_screen.dart` (NEW)
-- `product_management/lib/features/orders/presentation/screens/checkout_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/service/PaymentService.java` (UPDATE)
+#### Task 3.2: Hệ thống Coupon (Mã giảm giá)
 
-**Implementation:**
+- **UI:** Trang "Kho Voucher" của tôi.
+- **Feature:** Nhập mã giảm giá khi Checkout. Trừ tiền trực tiếp hoặc theo %.
 
-- Create PaymentMethodsScreen: Manage saved payment methods
-- Create PaymentHistoryScreen: Transaction history
-- Update CheckoutScreen: Integrate payment gateways (VNPay, Momo, etc.)
-- Backend: Add payment gateway integration, transaction tracking
+#### Task 3.3: So sánh Sản phẩm
 
-#### Task 3.2: Coupon & Promotion System
+- **UI:** Bảng so sánh 2-3 sản phẩm cạnh nhau.
+- **Feature:** So sánh giá, thông số kỹ thuật.
 
-**Files:**
+#### Task 3.4: Lịch sử & Yêu thích
 
-- `product_management/lib/features/promotions/presentation/screens/coupon_list_screen.dart` (NEW)
-- `product_management/lib/features/promotions/presentation/screens/apply_coupon_screen.dart` (NEW)
-- `product_management/lib/features/orders/presentation/screens/checkout_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/entity/Coupon.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/CouponController.java` (NEW)
+- **Feature:**
+- "Sản phẩm đã xem": Lưu lại 10-20 sản phẩm gần nhất.
+- "Sản phẩm yêu thích" (Wishlist): Đã có, cần hoàn thiện UI.
 
-**Implementation:**
+#### Task 3.5: Chia sẻ & Hỗ trợ
 
-- Create Coupon entity: code, discountType, discountValue, minPurchase, expiryDate
-- Create CouponListScreen: Available coupons for user
-- Create ApplyCouponScreen: Apply coupon code
-- Update CheckoutScreen: Add coupon input, apply discount
-- Backend: Coupon validation, discount calculation
-
-#### Task 3.3: Product Comparison
-
-**Files:**
-
-- `product_management/lib/features/products/presentation/screens/product_comparison_screen.dart` (NEW)
-- `product_management/lib/features/products/presentation/widgets/compare_button.dart` (NEW)
-- `product_management/lib/features/products/presentation/providers/comparison_provider.dart` (NEW)
-
-**Implementation:**
-
-- Create ComparisonProvider: Manage comparison list (max 3-4 products)
-- Create ProductComparisonScreen: Side-by-side comparison table
-- Create CompareButton: Add/remove from comparison
-- Show comparison button on product cards
-
-#### Task 3.4: View History & Recently Viewed
-
-**Files:**
-
-- `product_management/lib/features/products/presentation/screens/view_history_screen.dart` (NEW)
-- `product_management/lib/core/services/view_history_service.dart` (NEW)
-- `product_management/lib/features/products/presentation/screens/product_detail_screen.dart` (UPDATE)
-
-**Implementation:**
-
-- Create ViewHistoryService: Track viewed products (local storage)
-- Create ViewHistoryScreen: List recently viewed products
-- Update ProductDetailScreen: Track view on open
-- Add view history section in user profile
-
-#### Task 3.5: Social Sharing
-
-**Files:**
-
-- `product_management/lib/features/products/presentation/widgets/share_button.dart` (NEW)
-- `product_management/lib/core/services/share_service.dart` (NEW)
-
-**Implementation:**
-
-- Create ShareService: Share product via social media, copy link
-- Create ShareButton: Share widget
-- Add share button to product detail screen
-
-#### Task 3.6: Help & Support
-
-**Files:**
-
-- `product_management/lib/features/support/presentation/screens/help_center_screen.dart` (NEW)
-- `product_management/lib/features/support/presentation/screens/faq_screen.dart` (NEW)
-- `product_management/lib/features/support/presentation/screens/contact_support_screen.dart` (NEW)
-- `product_management/lib/features/shared/screens/user_main_screen.dart` (UPDATE)
-
-**Implementation:**
-
-- Create HelpCenterScreen: Main help page với categories
-- Create FAQScreen: Frequently asked questions
-- Create ContactSupportScreen: Contact form, live chat integration
-- Update UserProfileTab: Implement help & support button
+- **Feature:** Nút Share (Facebook, Zalo, Copy Link). Trang FAQ và Liên hệ hỗ trợ.
 
 ---
 
-## Phase 4: Advanced Admin Features
-
-### Mục tiêu
-
-Công cụ quản lý nâng cao và tự động hóa.
+## Phase 4: Tính năng Admin Nâng cao (Mở rộng)
 
 ### Tasks
 
-#### Task 4.1: Promotion Management
+#### Task 4.1: Quản lý Khuyến mãi
 
-**Files:**
+- **Feature:** Tạo mã Coupon (Số lượng, hạn dùng, mức giảm).
 
-- `product_management/lib/features/promotions/presentation/screens/admin_promotion_list_screen.dart` (NEW)
-- `product_management/lib/features/promotions/presentation/screens/admin_promotion_form_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/entity/Promotion.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/PromotionController.java` (NEW)
+#### Task 4.2: Quản lý Đánh giá
 
-**Implementation:**
+- **Feature:** Admin xem và duyệt các bình luận. Xóa bình luận spam/xúc phạm.
 
-- Create Promotion entity: name, type, discount, startDate, endDate, products
-- Create AdminPromotionListScreen: List promotions, activate/deactivate
-- Create AdminPromotionFormScreen: Create/edit promotions
-- Backend: Promotion CRUD, validation
+#### Task 4.3: Quản lý Danh mục Đa cấp
 
-#### Task 4.2: Rating & Review Management
+- **Feature:** Hỗ trợ danh mục cha - con (Ví dụ: Thời trang -> Nam -> Áo thun).
 
-**Files:**
+#### Task 4.4: Báo cáo Chuyên sâu
 
-- `product_management/lib/features/ratings/presentation/screens/admin_rating_list_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/ProductRatingController.java` (UPDATE)
-
-**Implementation:**
-
-- Create AdminRatingListScreen: 
-- List all ratings với filter
-- Approve/reject ratings
-- Delete inappropriate ratings
-- Reply to reviews
-- Backend: Add admin endpoints for rating management
-
-#### Task 4.3: Payment Management
-
-**Files:**
-
-- `product_management/lib/features/payments/presentation/screens/admin_payment_list_screen.dart` (NEW)
-- `product_management/lib/features/payments/presentation/screens/payment_detail_screen.dart` (UPDATE)
-
-**Implementation:**
-
-- Create AdminPaymentListScreen:
-- List all payments với filters
-- Search, filter by status, date, amount
-- Approve/reject payments
-- Refund functionality
-- Update PaymentDetailScreen: Admin view với actions
-
-#### Task 4.4: Category Management Enhancements
-
-**Files:**
-
-- `product_management/lib/features/categories/presentation/screens/category_management_screen.dart` (UPDATE)
-- `product_management/lib/features/categories/presentation/screens/category_form_screen.dart` (UPDATE)
-- `api/src/main/java/com/husc/productmanagement/entity/Category.java` (UPDATE)
-
-**Implementation:**
-
-- Add subcategories support: parentCategoryId field
-- Add category image/icon upload
-- Add category ordering: displayOrder field
-- Add SEO fields: metaTitle, metaDescription
-- Update CategoryFormScreen: Support subcategories, image upload
-
-#### Task 4.5: System Settings
-
-**Files:**
-
-- `product_management/lib/features/settings/presentation/screens/admin_settings_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/entity/SystemSetting.java` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/SettingController.java` (NEW)
-
-**Implementation:**
-
-- Create SystemSetting entity: key-value settings
-- Create AdminSettingsScreen:
-- Shipping configuration
-- Payment gateway settings
-- Email templates
-- Notification settings
-- Backend: Settings CRUD API
-
-#### Task 4.6: Advanced Reporting
-
-**Files:**
-
-- `product_management/lib/features/dashboard/presentation/screens/inventory_report_screen.dart` (NEW)
-- `product_management/lib/features/dashboard/presentation/screens/sales_report_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/ReportController.java` (NEW)
-
-**Implementation:**
-
-- Create InventoryReportScreen: Stock reports, low stock alerts
-- Create SalesReportScreen: Sales by product, category, period
-- Backend: Report generation, export PDF/Excel
-- Add scheduled report generation
+- **Feature:** Xuất báo cáo doanh thu ra Excel. Phân tích xu hướng mua hàng.
 
 ---
 
-## Phase 5: Polish & Optimization
-
-### Mục tiêu
-
-Hoàn thiện UI/UX, tối ưu hiệu năng, và các tính năng bổ sung.
+## Phase 5: Tối ưu & Hoàn thiện (Polish UI/UX)
 
 ### Tasks
 
-#### Task 5.1: Dark Mode Implementation
+#### Task 5.1: Dark Mode
 
-**Files:**
+- **Feature:** Chế độ giao diện tối cho toàn bộ ứng dụng.
 
-- `product_management/lib/core/theme/app_theme.dart` (NEW)
-- `product_management/lib/core/services/theme_service.dart` (NEW)
-- `product_management/lib/features/shared/screens/settings_screen.dart` (UPDATE)
-- `product_management/lib/main.dart` (UPDATE)
+#### Task 5.2: Đa ngôn ngữ
 
-**Implementation:**
+- **Feature:** Chuyển đổi Tiếng Việt / Tiếng Anh.
 
-- Create AppTheme: Define light và dark themes
-- Create ThemeService: Manage theme state, persistence
-- Update SettingsScreen: Theme toggle
-- Update main.dart: Wrap app với ThemeProvider
-- Test all screens với dark mode
+#### Task 5.3: Tối ưu Hiệu năng
 
-#### Task 5.2: Multi-language Support
+- **Tech:** Lazy loading hình ảnh, Caching dữ liệu API để app mượt hơn. Skeleton loading khi chờ dữ liệu.
 
-**Files:**
+#### Task 5.4: Hỗ trợ Offline
 
-- `product_management/lib/core/localization/app_localizations.dart` (NEW)
-- `product_management/lib/core/localization/app_localizations_en.dart` (NEW)
-- `product_management/lib/core/localization/app_localizations_vi.dart` (NEW)
-- `product_management/lib/features/shared/screens/settings_screen.dart` (UPDATE)
-- `product_management/pubspec.yaml` (UPDATE)
-
-**Implementation:**
-
-- Add flutter_localizations dependency
-- Create localization files cho English và Vietnamese
-- Create AppLocalizations class
-- Update SettingsScreen: Language selector
-- Update all hardcoded strings to use localization
-
-#### Task 5.3: Performance Optimization
-
-**Files:**
-
-- `product_management/lib/features/products/presentation/screens/user_product_list_screen.dart` (UPDATE)
-- `product_management/lib/features/products/presentation/widgets/product_card_user.dart` (UPDATE)
-- `product_management/lib/api/api_service.dart` (UPDATE)
-
-**Implementation:**
-
-- Implement pagination: Load products in pages
-- Add lazy loading: Load images on demand
-- Optimize API calls: Debounce search, cache responses
-- Add loading skeletons
-- Optimize list rendering: Use ListView.builder properly
-
-#### Task 5.4: Offline Support
-
-**Files:**
-
-- `product_management/lib/core/services/offline_service.dart` (NEW)
-- `product_management/lib/core/database/local_database.dart` (NEW)
-- `product_management/lib/features/products/presentation/providers/product_provider.dart` (UPDATE)
-
-**Implementation:**
-
-- Create LocalDatabase: SQLite database cho offline data
-- Create OfflineService: Sync data when online
-- Update ProductProvider: Cache products locally
-- Handle offline mode: Show cached data, queue actions
+- **Feature:** User vẫn xem được sản phẩm đã load khi mất mạng.
 
 #### Task 5.5: Push Notifications
 
-**Files:**
+- **Feature:** Bắn thông báo khi đơn hàng thay đổi trạng thái.
 
-- `product_management/lib/core/services/push_notification_service.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/service/NotificationService.java` (NEW)
+#### Task 5.6: Hoàn thiện Profile
 
-**Implementation:**
-
-- Integrate Firebase Cloud Messaging
-- Create PushNotificationService: Handle notifications
-- Backend: Send notifications for order updates
-- Register device tokens, handle notification clicks
-
-#### Task 5.6: Image Upload & Management
-
-**Files:**
-
-- `product_management/lib/core/services/image_picker_service.dart` (NEW)
-- `product_management/lib/core/services/image_upload_service.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/FileUploadController.java` (NEW)
-
-**Implementation:**
-
-- Create ImagePickerService: Pick images from gallery/camera
-- Create ImageUploadService: Upload to server/cloud storage
-- Backend: File upload endpoint, store in cloud (AWS S3, Cloudinary, etc.)
-- Update ProductFormScreen: Multiple image upload
-
-#### Task 5.7: User Profile Enhancements
-
-**Files:**
-
-- `product_management/lib/features/users/presentation/screens/edit_profile_screen.dart` (UPDATE)
-- `product_management/lib/features/auth/presentation/screens/change_password_screen.dart` (NEW)
-- `api/src/main/java/com/husc/productmanagement/controller/UserController.java` (UPDATE)
-
-**Implementation:**
-
-- Update EditProfileScreen: Avatar upload, better form
-- Create ChangePasswordScreen: Change password functionality
-- Backend: Add change password endpoint
-- Add email verification flow
-
-#### Task 5.8: Testing & Bug Fixes
-
-**Files:**
-
-- `product_management/test/` (ADD TESTS)
-- `api/src/test/` (ADD TESTS)
-
-**Implementation:**
-
-- Write unit tests cho critical features
-- Write integration tests cho API endpoints
-- Fix bugs discovered during testing
-- Performance testing và optimization
-
----
-
-## Architecture Flow
-
-```mermaid
-flowchart TD
-    User[User] --> Auth[Authentication]
-    Admin[Admin] --> Auth
-    
-    Auth --> JWT[JWT Filter]
-    JWT --> RBAC[Role-Based Access Control]
-    
-    RBAC --> UserFeatures[User Features]
-    RBAC --> AdminFeatures[Admin Features]
-    
-    UserFeatures --> Shopping[Shopping Flow]
-    UserFeatures --> Profile[Profile Management]
-    UserFeatures --> Orders[Order Management]
-    
-    AdminFeatures --> Dashboard[Analytics Dashboard]
-    AdminFeatures --> Management[Content Management]
-    AdminFeatures --> Reports[Reports & Analytics]
-    
-    Shopping --> Cart[Cart]
-    Cart --> Checkout[Checkout]
-    Checkout --> Payment[Payment]
-    Payment --> Order[Order Creation]
-    
-    Order --> Notification[Notifications]
-    Notification --> Tracking[Order Tracking]
-```
-
-
-
-## Dependencies & Prerequisites
-
-### Flutter Packages
-
-- `flutter_localizations` - Multi-language
-- `image_picker` - Image selection
-- `firebase_messaging` - Push notifications
-- `sqflite` - Local database
-- `share_plus` - Social sharing
-- `pdf` - PDF generation
-- `excel` - Excel export
-
-### Backend Dependencies
-
-- Spring Security Method Security
-- File upload libraries
-- PDF generation libraries
-- Email service integration
-
-## Estimated Timeline
-
-- **Phase 0**: 1-2 weeks (Critical foundation)
-- **Phase 1**: 3-4 weeks (Core user features)
-- **Phase 2**: 3-4 weeks (Core admin features)
-- **Phase 3**: 4-5 weeks (Advanced user features)
-- **Phase 4**: 4-5 weeks (Advanced admin features)
-- **Phase 5**: 3-4 weeks (Polish & optimization)
-
-**Total**: ~18-24 weeks (4.5-6 months)
-
-## Notes
-
-1. **Phase 0 is mandatory** - Must complete before other phases
-2. Phases 1-2 can be done in parallel (different teams)
-3. Phases 3-4 depend on Phases 1-2 completion
-4. Phase 5 can be done incrementally alongside other phases
+- **Feature:** Cho phép user upload Avatar, đổi mật khẩu, cập nhật thông tin cá nhân đầy đủ.

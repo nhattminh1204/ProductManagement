@@ -38,6 +38,26 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
+  Future<List<Product>> filterProducts({
+    String? keyword,
+    int? categoryId,
+    double? minPrice,
+    double? maxPrice,
+    double? minRating,
+    String? sortBy,
+  }) async {
+    final models = await _apiService.filterProducts(
+      keyword: keyword,
+      categoryId: categoryId,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      minRating: minRating,
+      sortBy: sortBy,
+    );
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
   Future<List<Product>> getFeaturedProducts() async {
     final models = await _apiService.getFeaturedProducts();
     return models.map((m) => _toEntity(m)).toList();

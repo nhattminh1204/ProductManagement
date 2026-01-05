@@ -29,10 +29,24 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
   Color _getStatusColor(String status) {
     switch(status.toLowerCase()) {
       case 'pending': return Colors.orange;
-      case 'paid': return Colors.blue;
-      case 'shipped': return Colors.green;
+      case 'paid': 
+      case 'confirmed': return Colors.blue;
+      case 'shipped': return Colors.purple;
+      case 'delivered': return Colors.green;
       case 'cancelled': return Colors.red;
       default: return Colors.grey;
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending': return 'Chờ xử lý';
+      case 'paid': return 'Đã thanh toán';
+      case 'confirmed': return 'Đã xác nhận';
+      case 'shipped': return 'Đang giao';
+      case 'delivered': return 'Đã giao';
+      case 'cancelled': return 'Đã hủy';
+      default: return status;
     }
   }
 
@@ -114,7 +128,7 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                order.status.toUpperCase(),
+                                _getStatusText(order.status).toUpperCase(),
                                 style: TextStyle(
                                   color: _getStatusColor(order.status),
                                   fontSize: 10,
@@ -183,6 +197,25 @@ class _UserOrderHistoryScreenState extends State<UserOrderHistoryScreen> {
                                 Text(order.customerName),
                                 if (order.address != null) Text(order.address!),
                                 if (order.phone != null) Text(order.phone!),
+                                const SizedBox(height: 12),
+                                if (order.status.toLowerCase() == 'shipped')
+                                  Center(
+                                    child: FilledButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => OrderDetailScreen(orderId: order.id),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.check_circle_outline),
+                                    label: const Text('Xác nhận đã nhận hàng'),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),

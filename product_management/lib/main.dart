@@ -18,6 +18,7 @@ import 'features/inventory/data/repositories/inventory_repository_impl.dart';
 import 'features/payments/data/repositories/payment_repository_impl.dart';
 import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'features/users/data/repositories/user_repository_impl.dart';
+import 'features/addresses/data/repositories/user_address_repository_impl.dart';
 
 // Auth Use Cases
 import 'features/auth/domain/usecases/login_usecase.dart';
@@ -34,6 +35,10 @@ import 'features/products/domain/usecases/get_low_stock_products_usecase.dart';
 import 'features/products/domain/usecases/create_product_usecase.dart';
 import 'features/products/domain/usecases/update_product_usecase.dart';
 import 'features/products/domain/usecases/delete_product_usecase.dart';
+import 'features/products/domain/usecases/filter_products_usecase.dart';
+
+// Address Use Cases
+import 'features/addresses/domain/usecases/address_usecases.dart';
 
 // Category Use Cases
 import 'features/categories/domain/usecases/get_categories_usecase.dart';
@@ -60,15 +65,21 @@ import 'features/ratings/domain/usecases/get_ratings_by_user_usecase.dart';
 import 'features/ratings/domain/usecases/create_rating_usecase.dart';
 import 'features/ratings/domain/usecases/delete_rating_usecase.dart';
 
+import 'features/ratings/domain/usecases/get_all_ratings_usecase.dart';
+
 // Payment Use Cases
 import 'features/payments/domain/usecases/create_payment_usecase.dart';
+
 import 'features/payments/domain/usecases/get_payment_by_id_usecase.dart';
 import 'features/payments/domain/usecases/get_payments_by_order_usecase.dart';
 import 'features/payments/domain/usecases/get_payments_by_user_usecase.dart';
 import 'features/payments/domain/usecases/update_payment_status_usecase.dart';
 
+import 'features/payments/domain/usecases/get_all_payments_usecase.dart';
+
 // Dashboard Use Cases
 import 'features/dashboard/domain/usecases/get_dashboard_stats_usecase.dart';
+
 import 'features/dashboard/domain/usecases/get_revenue_by_period_usecase.dart';
 import 'features/dashboard/domain/usecases/get_top_products_usecase.dart';
 import 'features/dashboard/domain/usecases/get_order_stats_by_status_usecase.dart';
@@ -90,6 +101,7 @@ import 'features/inventory/presentation/providers/inventory_provider.dart';
 import 'features/payments/presentation/providers/payment_provider.dart';
 import 'features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'features/users/presentation/providers/user_provider.dart';
+import 'features/addresses/presentation/providers/user_address_provider.dart';
 
 import 'product_management/presentation/design_system.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
@@ -115,6 +127,7 @@ void main() async {
   final paymentRepo = PaymentRepositoryImpl(apiService);
   final dashboardRepo = DashboardRepositoryImpl(apiService);
   final userRepo = UserRepositoryImpl(apiService);
+  final addressRepo = UserAddressRepositoryImpl(apiService);
 
   // 3. Initialize Use Cases
   // Auth
@@ -132,6 +145,13 @@ void main() async {
   final createProductUseCase = CreateProductUseCase(productRepo);
   final updateProductUseCase = UpdateProductUseCase(productRepo);
   final deleteProductUseCase = DeleteProductUseCase(productRepo);
+  final filterProductsUseCase = FilterProductsUseCase(productRepo);
+
+  // Address
+  final getUserAddressesUseCase = GetUserAddressesUseCase(addressRepo);
+  final createAddressUseCase = CreateAddressUseCase(addressRepo);
+  final updateAddressUseCase = UpdateAddressUseCase(addressRepo);
+  final deleteAddressUseCase = DeleteAddressUseCase(addressRepo);
 
   // Category
   final getCategoriesUseCase = GetCategoriesUseCase(categoryRepo);
@@ -157,6 +177,7 @@ void main() async {
   final getRatingsByUserUseCase = GetRatingsByUserUseCase(ratingRepo);
   final createRatingUseCase = CreateRatingUseCase(ratingRepo);
   final deleteRatingUseCase = DeleteRatingUseCase(ratingRepo);
+  final getAllRatingsUseCase = GetAllRatingsUseCase(ratingRepo);
 
   // Payment
   final createPaymentUseCase = CreatePaymentUseCase(paymentRepo);
@@ -164,6 +185,7 @@ void main() async {
   final getPaymentsByOrderUseCase = GetPaymentsByOrderUseCase(paymentRepo);
   final getPaymentsByUserUseCase = GetPaymentsByUserUseCase(paymentRepo);
   final updatePaymentStatusUseCase = UpdatePaymentStatusUseCase(paymentRepo);
+  final getAllPaymentsUseCase = GetAllPaymentsUseCase(paymentRepo);
 
   // Dashboard
   final getDashboardStatsUseCase = GetDashboardStatsUseCase(dashboardRepo);
@@ -191,6 +213,7 @@ void main() async {
             getProductByIdUseCase,
             getProductsByCategoryUseCase,
             searchProductsUseCase,
+            filterProductsUseCase,
             getFeaturedProductsUseCase,
             getLowStockProductsUseCase,
             createProductUseCase,
@@ -230,6 +253,7 @@ void main() async {
           create: (_) => RatingProvider(
             getRatingsByProductUseCase,
             getRatingsByUserUseCase,
+            getAllRatingsUseCase,
             createRatingUseCase,
             deleteRatingUseCase,
           ),
@@ -247,6 +271,7 @@ void main() async {
             getPaymentsByOrderUseCase,
             getPaymentsByUserUseCase,
             updatePaymentStatusUseCase,
+            getAllPaymentsUseCase,
           ),
         ),
         ChangeNotifierProvider(
@@ -263,6 +288,14 @@ void main() async {
             getUserByIdUseCase,
             updateUserUseCase,
             deleteUserUseCase,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserAddressProvider(
+            getUserAddressesUseCase,
+            createAddressUseCase,
+            updateAddressUseCase,
+            deleteAddressUseCase,
           ),
         ),
       ],

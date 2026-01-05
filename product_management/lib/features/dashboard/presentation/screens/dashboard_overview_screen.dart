@@ -13,7 +13,8 @@ class DashboardOverviewScreen extends StatefulWidget {
   const DashboardOverviewScreen({super.key});
 
   @override
-  State<DashboardOverviewScreen> createState() => _DashboardOverviewScreenState();
+  State<DashboardOverviewScreen> createState() =>
+      _DashboardOverviewScreenState();
 }
 
 class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
@@ -45,191 +46,210 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
       body: dashboardProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : dashboardProvider.error != null
-              ? Center(child: Text('Lỗi: ${dashboardProvider.error}'))
-              : stats == null
-                  ? const Center(child: Text('Không có dữ liệu'))
-                  : RefreshIndicator(
-                      onRefresh: () async {
-                        await dashboardProvider.fetchDashboardStats();
-                        await dashboardProvider.fetchTopProducts(10);
-                        await dashboardProvider.fetchRevenueByPeriod('month');
-                        await dashboardProvider.fetchOrderStatsByStatus();
-                      },
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+          ? Center(child: Text('Lỗi: ${dashboardProvider.error}'))
+          : stats == null
+          ? const Center(child: Text('Không có dữ liệu'))
+          : RefreshIndicator(
+              onRefresh: () async {
+                await dashboardProvider.fetchDashboardStats();
+                await dashboardProvider.fetchTopProducts(10);
+                await dashboardProvider.fetchRevenueByPeriod('month');
+                await dashboardProvider.fetchOrderStatsByStatus();
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Summary Cards
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryCard(
+                            'Tổng đơn hàng',
+                            stats.totalOrders.toString(),
+                            Icons.shopping_cart,
+                            Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildSummaryCard(
+                            'Tổng doanh thu',
+                            stats.totalRevenue.formatPriceWithCurrency(),
+                            Icons.attach_money,
+                            Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryCard(
+                            'Tổng sản phẩm',
+                            stats.totalProducts.toString(),
+                            Icons.inventory_2,
+                            Colors.orange,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildSummaryCard(
+                            'Tổng người dùng',
+                            stats.totalUsers.toString(),
+                            Icons.people,
+                            Colors.purple,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Revenue Chart Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Doanh thu (Tháng này)',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
                           children: [
-                            // Summary Cards
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildSummaryCard(
-                                    'Tổng đơn hàng',
-                                    stats.totalOrders.toString(),
-                                    Icons.shopping_cart,
-                                    Colors.blue,
+                            TextButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const RevenueAnalyticsScreen(),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildSummaryCard(
-                                    'Tổng doanh thu',
-                                    stats.totalRevenue.formatPriceWithCurrency(),
-                                    Icons.attach_money,
-                                    Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildSummaryCard(
-                                    'Tổng sản phẩm',
-                                    stats.totalProducts.toString(),
-                                    Icons.inventory_2,
-                                    Colors.orange,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildSummaryCard(
-                                    'Tổng người dùng',
-                                    stats.totalUsers.toString(),
-                                    Icons.people,
-                                    Colors.purple,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            // Revenue Chart Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Doanh thu (Tháng này)',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                Row(
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const RevenueAnalyticsScreen(),
-                                          ),
-                                        );
-                                      },
-                                      icon: const Icon(Icons.trending_up),
-                                      label: const Text('Phân tích'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Card(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const RevenueAnalyticsScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: _buildMiniRevenueChart(dashboardProvider.revenue),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Order Stats Chart Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Thống kê đơn hàng',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                TextButton.icon(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const OrderStatisticsScreen(),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.pie_chart),
-                                  label: const Text('Chi tiết'),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Card(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const OrderStatisticsScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: _buildMiniOrderStatsChart(dashboardProvider.orderStatsByStatus),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Top Products
-                            const Text(
-                              'Sản phẩm bán chạy',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 12),
-                            Card(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: dashboardProvider.topProducts.length,
-                                itemBuilder: (context, index) {
-                                  final product = dashboardProvider.topProducts[index];
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      child: Text('${index + 1}'),
-                                    ),
-                                    title: Text(product.productName),
-                                    subtitle: Text('Đã bán: ${product.totalSold}'),
-                                    trailing: Text(
-                                      product.totalRevenue.formatPriceWithCurrency(),
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                  );
-                                },
-                              ),
+                                );
+                              },
+                              icon: const Icon(Icons.trending_up),
+                              label: const Text('Phân tích'),
                             ),
                           ],
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RevenueAnalyticsScreen(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: SizedBox(
+                            height: 200,
+                            child: _buildMiniRevenueChart(
+                              dashboardProvider.revenue,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    // Order Stats Chart Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Thống kê đơn hàng',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const OrderStatisticsScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.pie_chart),
+                          label: const Text('Chi tiết'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OrderStatisticsScreen(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: SizedBox(
+                            height: 200,
+                            child: _buildMiniOrderStatsChart(
+                              dashboardProvider.orderStatsByStatus,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Top Products
+                    const Text(
+                      'Sản phẩm bán chạy',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: dashboardProvider.topProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = dashboardProvider.topProducts[index];
+                          return ListTile(
+                            leading: CircleAvatar(child: Text('${index + 1}')),
+                            title: Text(product.productName),
+                            subtitle: Text('Đã bán: ${product.totalSold}'),
+                            trailing: Text(
+                              product.totalRevenue.formatPriceWithCurrency(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -238,9 +258,7 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: color, size: 32),
-              ],
+              children: [Icon(icon, color: color, size: 32)],
             ),
             const SizedBox(height: 12),
             Text(
@@ -264,9 +282,7 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
 
   Widget _buildMiniRevenueChart(Map<String, double> revenue) {
     if (revenue.isEmpty) {
-      return const Center(
-        child: Text('Không có dữ liệu doanh thu'),
-      );
+      return const Center(child: Text('Không có dữ liệu doanh thu'));
     }
 
     final entries = revenue.entries.toList();
@@ -327,9 +343,7 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
 
   Widget _buildMiniOrderStatsChart(Map<String, int> orderStats) {
     if (orderStats.isEmpty) {
-      return const Center(
-        child: Text('Không có thống kê đơn hàng'),
-      );
+      return const Center(child: Text('Không có thống kê đơn hàng'));
     }
 
     final entries = orderStats.entries.toList();

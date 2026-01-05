@@ -32,13 +32,108 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       case 'pending':
         return Colors.orange;
       case 'paid':
+      case 'confirmed':
         return Colors.blue;
       case 'shipped':
+        return Colors.purple;
+      case 'delivered':
         return Colors.green;
       case 'cancelled':
         return Colors.red;
       default:
         return Colors.grey;
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Chờ xử lý';
+      case 'paid':
+        return 'Đã thanh toán';
+      case 'confirmed':
+        return 'Đã xác nhận';
+      case 'shipped':
+        return 'Đang giao';
+      case 'delivered':
+        return 'Đã giao';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return status;
+    }
+  }
+
+  String _getPaymentStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Chờ thanh toán';
+      case 'paid':
+        return 'Đã thanh toán';
+      case 'failed':
+        return 'Thất bại';
+      default:
+        return status;
+    }
+  }
+
+  Color _getPaymentStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'paid':
+        return Colors.green;
+      case 'failed':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _updateStatus(int id, String status) async {
+    final success = await context.read<OrderProvider>().updateOrderStatus(
+      id,
+      status,
+    );
+    if (success && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Cập nhật trạng thái thành công')));
+      // Refresh order details
+      context.read<OrderProvider>().fetchOrderById(id);
+      // Refresh payment status
+      context.read<PaymentProvider>().fetchPaymentsByOrder(id);
+    }
+  }
+
+  void _cancelOrder(int id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hủy đơn hàng'),
+        content: const Text('Bạn có chắc chắn muốn hủy đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Không'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Có'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await context.read<OrderProvider>().cancelOrder(id);
+      if (success && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã hủy đơn hàng thành công')));
+        // Refresh order details
+        context.read<OrderProvider>().fetchOrderById(id);
+      }
     }
   }
 
@@ -85,7 +180,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      order.status.toUpperCase(),
+                                      _getStatusText(order.status).toUpperCase(),
                                       style: TextStyle(
                                         color: _getStatusColor(order.status),
                                         fontWeight: FontWeight.bold,
@@ -166,31 +261,78 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     style: TextStyle(
                                         fontSize: 18, fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 12),
-                                ...paymentProvider.payments.map((payment) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                ...paymentProvider.payments.map((payment) => Container(
+                                      padding: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.grey.withValues(alpha: 0.1),
+                                          ),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('Thanh toán #${payment.id}',
-                                                  style: const TextStyle(
-                                                      fontWeight: FontWeight.bold)),
-                                              Text(payment.status.toUpperCase(),
-                                                  style: TextStyle(
-                                                      color: payment.status == 'paid'
-                                                          ? Colors.green
-                                                          : Colors.orange)),
+                                              Text(
+                                                'Thanh toán #${payment.id}',
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Text(
+                                                payment.amount
+                                                    .formatPriceWithCurrency(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16),
+                                              ),
                                             ],
                                           ),
-                                          Text(
-                                            payment.amount.formatPriceWithCurrency(),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              const Text('Trạng thái: '),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: _getPaymentStatusColor(
+                                                          payment.status)
+                                                      .withValues(alpha: 0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  _getPaymentStatusText(
+                                                      payment.status),
+                                                  style: TextStyle(
+                                                    color: _getPaymentStatusColor(
+                                                        payment.status),
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                              'Phương thức: ${payment.paymentMethod}'),
+                                          if (payment.paidAt != null)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4),
+                                              child: Text(
+                                                'Thời gian: ${DateFormat('dd/MM/yyyy HH:mm').format(payment.paidAt!)}',
+                                                style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 12),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     )),
@@ -200,38 +342,141 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ),
                       const SizedBox(height: 16),
                       // Actions
-                      if (order.status == 'pending')
-                          ElevatedButton(
-                          onPressed: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Hủy đơn hàng'),
-                                content: const Text(
-                                    'Bạn có chắc chắn muốn hủy đơn hàng này không?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: const Text('Không'),
+                      if (context.read<AuthProvider>().isAdmin)
+                        Column(
+                          children: [
+                            if (order.status.toLowerCase() == 'pending')
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => _cancelOrder(order.id),
+                                      icon: const Icon(Icons.close, color: Colors.red),
+                                      label: const Text('Hủy đơn', style: TextStyle(color: Colors.red)),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.red),
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                    ),
                                   ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: const Text('Có'),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: FilledButton.icon(
+                                      onPressed: () => _updateStatus(order.id, 'confirmed'),
+                                      icon: const Icon(Icons.check),
+                                      label: const Text('Duyệt đơn'),
+                                      style: FilledButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                            );
-                            if (confirmed == true) {
-                              await orderProvider.cancelOrder(order.id);
-                              if (mounted) Navigator.pop(context);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(double.infinity, 48),
-                          ),
-                          child: const Text('Hủy đơn hàng'),
+                            if (order.status.toLowerCase() == 'confirmed' ||
+                                order.status.toLowerCase() == 'paid')
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  onPressed: () => _updateStatus(order.id, 'shipped'),
+                                  icon: const Icon(Icons.local_shipping),
+                                  label: const Text('Bắt đầu giao hàng'),
+                                  style: FilledButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                ),
+                              ),
+                            if (order.status.toLowerCase() == 'shipped')
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  onPressed: () => _updateStatus(order.id, 'delivered'),
+                                  icon: const Icon(Icons.check_circle),
+                                  label: const Text('Xác nhận đã giao hàng'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            if (order.status.toLowerCase() == 'pending')
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Hủy đơn hàng'),
+                                      content: const Text(
+                                          'Bạn có chắc chắn muốn hủy đơn hàng này không?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text('Không'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text('Có'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirmed == true) {
+                                    await orderProvider.cancelOrder(order.id);
+                                    if (mounted) Navigator.pop(context);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 48),
+                                ),
+                                child: const Text('Hủy đơn hàng'),
+                              ),
+                            if (order.status.toLowerCase() == 'shipped')
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  onPressed: () async {
+                                      final confirmed = await showDialog<bool>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Xác nhận đã nhận hàng'),
+                                        content: const Text(
+                                            'Bạn xác nhận đã nhận được đầy đủ hàng và muốn hoàn tất đơn hàng này?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context, false),
+                                            child: const Text('Hủy'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context, true),
+                                            child: const Text('Đồng ý'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    if(confirmed == true) {
+                                      _updateStatus(order.id, 'delivered');
+                                    }
+                                  },
+                                  icon: const Icon(Icons.check_circle_outline),
+                                  label: const Text('Đã nhận được hàng'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                     ],
                   ),

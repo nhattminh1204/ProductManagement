@@ -8,6 +8,12 @@ class RatingRepositoryImpl implements RatingRepository {
   RatingRepositoryImpl(this._apiService);
 
   @override
+  Future<List<Rating>> getAllRatings() async {
+    final models = await _apiService.getAllRatings();
+    return models.map((m) => _toEntity(m)).toList();
+  }
+
+  @override
   Future<List<Rating>> getRatingsByProduct(int productId) async {
     final models = await _apiService.getRatingsByProduct(productId);
     return models.map((m) => _toEntity(m)).toList();

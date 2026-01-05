@@ -71,9 +71,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedCategoryId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vui lòng chọn danh mục')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Vui lòng chọn danh mục')));
         return;
       }
 
@@ -161,8 +161,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       controller: _quantityController,
                       decoration: const InputDecoration(labelText: 'Số lượng'),
                       keyboardType: TextInputType.number,
-                      validator: (val) =>
-                          val!.isEmpty ? 'Nhập số lượng' : null,
+                      validator: (val) => val!.isEmpty ? 'Nhập số lượng' : null,
                     ),
                   ),
                 ],
@@ -175,7 +174,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   return DropdownMenuItem(value: c.id, child: Text(c.name));
                 }).toList(),
                 onChanged: (val) => setState(() => _selectedCategoryId = val),
-                 hint: categoryProvider.isLoading
+                hint: categoryProvider.isLoading
                     ? const Text('Đang tải danh mục...')
                     : const Text('Chọn danh mục'),
               ),
@@ -188,16 +187,36 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               const SizedBox(height: 30),
               Consumer<ProductProvider>(
                 builder: (context, provider, _) {
-                  return ElevatedButton(
-                    onPressed: provider.isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text(
-                      isEditing ? 'Cập nhật' : 'Tạo mới',
-                    ),
+                  return Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: provider.isLoading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(isEditing ? 'Cập nhật' : 'Tạo mới'),
+                        ),
+                      ),
+                      if (isEditing) ...[
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: provider.isLoading ? null : _delete,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Xóa sản phẩm'),
+                          ),
+                        ),
+                      ],
+                    ],
                   );
                 },
               ),
@@ -206,5 +225,43 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         ),
       ),
     );
+  }
+
+  void _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xóa sản phẩm'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final provider = context.read<ProductProvider>();
+      final success = await provider.deleteProduct(widget.product!.id);
+
+      if (success && mounted) {
+        Navigator.pop(context); // Close form
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Xóa thành công')));
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(provider.errorMessage ?? 'Xóa thất bại')),
+        );
+      }
+    }
   }
 }

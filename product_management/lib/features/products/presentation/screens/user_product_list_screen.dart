@@ -7,6 +7,7 @@ import '../widgets/product_card_user.dart';
 import '../../../shared/design_system.dart';
 import '../../../orders/presentation/screens/cart_screen.dart';
 import '../../../shared/widgets/add_to_cart_animation.dart';
+import '../widgets/product_filter_sheet.dart';
 
 class UserProductListScreen extends StatefulWidget {
   const UserProductListScreen({super.key});
@@ -17,7 +18,7 @@ class UserProductListScreen extends StatefulWidget {
 
 class _UserProductListScreenState extends State<UserProductListScreen> {
   final _searchController = TextEditingController();
-  String? _selectedCategory;
+  int? _selectedCategoryId;
 
   @override
   void initState() {
@@ -62,15 +63,8 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
     final productProvider = context.watch<ProductProvider>();
     final categoryProvider = context.watch<CategoryProvider>();
 
-    // Client-side filter
+    // Display products from provider (already filtered by backend)
     List displayProducts = productProvider.products;
-
-    // Filter by Category
-    if (_selectedCategory != null) {
-      displayProducts = displayProducts
-          .where((p) => p.categoryName == _selectedCategory)
-          .toList();
-    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -111,38 +105,69 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                 horizontal: 20.0,
                 vertical: 10.0,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 15,
-                      offset: const Offset(0, 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 15,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Tìm kiếm sản phẩm...',
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              color: AppColors.primary.withValues(alpha: 0.7),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                          onSubmitted: _onSearch,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 15,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.tune_rounded, color: AppColors.primary),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const ProductFilterSheet(),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Tìm kiếm sản phẩm...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(
-                      Icons.search_rounded,
-                      color: AppColors.primary.withValues(alpha: 0.7),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                  onSubmitted: _onSearch,
-                ),
-              ),
             ),
           ),
 
@@ -157,23 +182,26 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                 children: [
                   _buildCategoryChip(
                     'Tất cả',
-                    _selectedCategory == null,
+                    _selectedCategoryId == null,
                     onTap: () {
                       setState(() {
-                        _selectedCategory = null;
+                        _selectedCategoryId = null;
                       });
+                      context.read<ProductProvider>().filterProducts(categoryId: null);
                     },
                   ),
                   ...categoryProvider.categories.map((cat) {
                     return _buildCategoryChip(
                       cat.name,
-                      _selectedCategory == cat.name,
+                      _selectedCategoryId == cat.id,
                       onTap: () {
                         setState(() {
-                          if (_selectedCategory == cat.name) {
-                            _selectedCategory = null;
+                          if (_selectedCategoryId == cat.id) {
+                            _selectedCategoryId = null;
+                            context.read<ProductProvider>().filterProducts(categoryId: null);
                           } else {
-                            _selectedCategory = cat.name;
+                            _selectedCategoryId = cat.id;
+                            context.read<ProductProvider>().filterProducts(categoryId: cat.id);
                           }
                         });
                       },

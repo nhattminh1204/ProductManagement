@@ -8,6 +8,7 @@ import '../providers/order_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 import 'order_detail_screen.dart';
+import '../widgets/order_filter_bottom_sheet.dart';
 
 class OrderListScreen extends StatefulWidget {
   const OrderListScreen({super.key});
@@ -97,6 +98,30 @@ class _OrderListScreenState extends State<OrderListScreen> {
     }
   }
 
+  void _showFilterBottomSheet(BuildContext context) {
+    final orderProvider = context.read<OrderProvider>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => OrderFilterBottomSheet(
+        initialStatus: orderProvider.filterStatus,
+        initialStartDate: orderProvider.filterStartDate,
+        initialEndDate: orderProvider.filterEndDate,
+        onApply: (status, startDate, endDate) {
+          orderProvider.setFilters(
+            status: status,
+            startDate: startDate,
+            endDate: endDate,
+          );
+        },
+        onClear: () {
+          orderProvider.clearFilters();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final orderProvider = context.watch<OrderProvider>();
@@ -108,6 +133,43 @@ class _OrderListScreenState extends State<OrderListScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm đơn hàng...',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                    ),
+                    onChanged: (value) {
+                      context.read<OrderProvider>().setFilters(query: value);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () => _showFilterBottomSheet(context),
+                  icon: const Icon(Icons.filter_list),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: orderProvider.isLoading
           ? const Center(child: CircularProgressIndicator())

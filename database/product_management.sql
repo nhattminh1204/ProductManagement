@@ -57,7 +57,7 @@ CREATE TABLE orders (
     note TEXT,
     total_amount DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(50) NOT NULL,
-    status ENUM('pending','paid','shipped','cancelled') NOT NULL DEFAULT 'pending',
+    status ENUM('pending','confirmed','paid','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -137,4 +137,19 @@ CREATE TABLE inventory_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Bảng user_addresses (địa chỉ giao hàng)
+CREATE TABLE user_addresses (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    recipient_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address TEXT NOT NULL,
+    city VARCHAR(100),
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

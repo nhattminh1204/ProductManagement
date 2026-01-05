@@ -67,8 +67,10 @@ public class Order {
 
     public enum Status {
         PENDING("pending"),
+        CONFIRMED("confirmed"),
         PAID("paid"),
         SHIPPED("shipped"),
+        DELIVERED("delivered"),
         CANCELLED("cancelled");
 
         private final String value;

@@ -36,10 +36,17 @@ class OrderProvider extends ChangeNotifier {
   );
 
   List<Order> _orders = [];
+  List<Order> _allOrders = []; // Store all orders for client-side filtering
   List<Order> _userOrders = [];
   Order? _selectedOrder;
   bool _isLoading = false;
   String? _errorMessage;
+
+  // Filter state
+  String? _filterStatus;
+  DateTime? _filterStartDate;
+  DateTime? _filterEndDate;
+  String? _searchQuery;
 
   List<Order> get orders => _orders;
   List<Order> get userOrders => _userOrders;
@@ -47,14 +54,21 @@ class OrderProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // Getters for filter state
+  String? get filterStatus => _filterStatus;
+  DateTime? get filterStartDate => _filterStartDate;
+  DateTime? get filterEndDate => _filterEndDate;
+  String? get searchQuery => _searchQuery;
+
   Future<void> fetchOrders() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _orders = await _getOrdersUseCase();
-      _orders.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+      _allOrders = await _getOrdersUseCase();
+      _allOrders.sort((a, b) => b.createdDate.compareTo(a.createdDate));
+      _applyFilters();
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -62,6 +76,88 @@ class OrderProvider extends ChangeNotifier {
       _errorMessage = e.toString();
       notifyListeners();
     }
+  }
+
+  void setFilters({
+    String? status,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? query,
+  }) {
+    _filterStatus = status;
+    _filterStartDate = startDate;
+    _filterEndDate = endDate;
+    if (query != null) {
+      _searchQuery = query;
+    }
+    _applyFilters();
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _filterStatus = null;
+    _filterStartDate = null;
+    _filterEndDate = null;
+    _searchQuery = null;
+    _applyFilters();
+    notifyListeners();
+  }
+
+  void _applyFilters() {
+    _orders = _allOrders.where((order) {
+      // Status filter
+      if (_filterStatus != null &&
+          order.status.toLowerCase() != _filterStatus!.toLowerCase()) {
+        return false;
+      }
+
+      // Date range filter
+      if (_filterStartDate != null) {
+        final orderDate = DateTime(
+          order.createdDate.year,
+          order.createdDate.month,
+          order.createdDate.day,
+        );
+        final startDate = DateTime(
+          _filterStartDate!.year,
+          _filterStartDate!.month,
+          _filterStartDate!.day,
+        );
+        if (orderDate.isBefore(startDate)) {
+          return false;
+        }
+      }
+
+      if (_filterEndDate != null) {
+         final orderDate = DateTime(
+          order.createdDate.year,
+          order.createdDate.month,
+          order.createdDate.day,
+        );
+        final endDate = DateTime(
+          _filterEndDate!.year,
+          _filterEndDate!.month,
+          _filterEndDate!.day,
+        );
+        if (orderDate.isAfter(endDate)) {
+          return false;
+        }
+      }
+
+      // Search query (Order Code, Customer Name, Email)
+      if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+        final query = _searchQuery!.toLowerCase();
+        final matchesCode = order.orderCode.toLowerCase().contains(query);
+        final matchesName = order.customerName.toLowerCase().contains(query);
+        final matchesEmail = order.email?.toLowerCase().contains(query) ?? false;
+        
+        if (!matchesCode && !matchesName && !matchesEmail) {
+          return false;
+        }
+      }
+
+      return true;
+    }).toList();
   }
 
   Future<Order?> getOrderById(int id) async {
