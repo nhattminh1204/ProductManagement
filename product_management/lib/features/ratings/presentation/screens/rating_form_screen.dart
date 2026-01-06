@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/rating_provider.dart';
 import '../../domain/entities/rating_entity.dart';
-import '../../../shared/design_system.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 
 class RatingFormScreen extends StatefulWidget {
   final int productId;
@@ -34,7 +34,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
     if (_formKey.currentState!.validate()) {
       final ratingProvider = context.read<RatingProvider>();
       final authProvider = context.read<AuthProvider>();
-      
+
       // Get user ID from AuthProvider
       final userId = authProvider.userId;
 
@@ -42,7 +42,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Vui lòng đăng nhập để đánh giá'),
+            content: Text('Please login to rate'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -54,8 +54,8 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
         productId: widget.productId,
         userId: userId,
         rating: _rating,
-        comment: _commentController.text.trim().isEmpty 
-            ? null 
+        comment: _commentController.text.trim().isEmpty
+            ? null
             : _commentController.text.trim(),
         createdDate: DateTime.now(),
         productName: widget.productName,
@@ -66,7 +66,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Gửi đánh giá thành công'),
+            content: Text('Rating submitted successfully'),
             backgroundColor: AppColors.secondary,
           ),
         );
@@ -79,7 +79,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đánh giá sản phẩm'),
+        title: const Text('Rate Product'),
         centerTitle: true,
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -106,7 +106,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                 ),
               const SizedBox(height: 24),
               const Text(
-                'Đánh giá',
+                'Rating',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -128,7 +128,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                 }),
               ),
               Text(
-                '$_rating trên 5 sao',
+                '$_rating out of 5 stars',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -140,10 +140,10 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
               TextFormField(
                 controller: _commentController,
                 decoration: const InputDecoration(
-                  labelText: 'Nhận xét (Tùy chọn)',
+                  labelText: 'Comment (Optional)',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.comment),
-                  hintText: 'Chia sẻ trải nghiệm của bạn...',
+                  hintText: 'Share your experience...',
                 ),
                 maxLines: 5,
               ),
@@ -163,7 +163,7 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text(
-                            'Gửi đánh giá',
+                            'Submit Rating',
                             style: TextStyle(fontSize: 16),
                           ),
                   );
@@ -176,4 +176,3 @@ class _RatingFormScreenState extends State<RatingFormScreen> {
     );
   }
 }
-

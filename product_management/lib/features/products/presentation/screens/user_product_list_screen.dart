@@ -4,7 +4,7 @@ import '../providers/product_provider.dart';
 import '../../../categories/presentation/providers/category_provider.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 import '../widgets/product_card_user.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../../orders/presentation/screens/cart_screen.dart';
 import '../../../shared/widgets/add_to_cart_animation.dart';
 import '../widgets/product_filter_sheet.dart';
@@ -75,22 +75,17 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
             pinned: true,
             floating: false,
             elevation: 0,
-            backgroundColor: AppColors.primary,
+            // backgroundColor: AppColors.primary, // Default from Theme
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
-            title: Text(
-              'Sản phẩm',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+            title: const Text(
+              'Products',
             ),
             centerTitle: true,
             actions: [
               IconButton(
                 icon: const Icon(
                   Icons.notifications_none_rounded,
-                  color: Colors.white,
                 ),
                 onPressed: () {},
               ),
@@ -123,7 +118,7 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            hintText: 'Tìm kiếm sản phẩm...',
+                            hintText: 'Search products...',
                             hintStyle: TextStyle(color: Colors.grey[400]),
                             prefixIcon: Icon(
                               Icons.search_rounded,
@@ -181,7 +176,7 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
                   _buildCategoryChip(
-                    'Tất cả',
+                    'All',
                     _selectedCategoryId == null,
                     onTap: () {
                       setState(() {
@@ -233,27 +228,31 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
                     vertical: 10,
                   ),
                   sliver: SliverGrid(
+                    key: ValueKey(_selectedCategoryId ?? 'all'), // Key added to force rebuild and re-animate children
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 0.65,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
                         ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final product = displayProducts[index];
-                      return RepaintBoundary(
-                        child: ProductCardUser(
-                          key: ValueKey(product.id),
-                          product: product,
-                          onAddToCart: (imageKey) async =>
-                              _handleAddToCart(imageKey, product),
+                      return StaggeredEntryWidget( // Wrap with StaggeredEntryWidget
+                        index: index,
+                        child: RepaintBoundary(
+                          child: ProductCardUser(
+                            key: ValueKey(product.id),
+                            product: product,
+                            onAddToCart: (imageKey) async =>
+                                _handleAddToCart(imageKey, product),
+                          ),
                         ),
                       );
                     }, childCount: displayProducts.length),
                   ),
                 ),
-          SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
         ],
       ),
       floatingActionButton: Consumer<CartProvider>(
@@ -348,6 +347,74 @@ class _UserProductListScreenState extends State<UserProductListScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class StaggeredEntryWidget extends StatefulWidget {
+  final int index;
+  final Widget child;
+
+  const StaggeredEntryWidget({
+    super.key,
+    required this.index,
+    required this.child,
+  });
+
+  @override
+  State<StaggeredEntryWidget> createState() => _StaggeredEntryWidgetState();
+}
+
+class _StaggeredEntryWidgetState extends State<StaggeredEntryWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutQuad,
+    ));
+
+    // Stagger delay based on index
+    final delay = Duration(milliseconds: 50 * (widget.index % 10)); // Cap delay for long lists
+    Future.delayed(delay, () {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: widget.child,
       ),
     );
   }

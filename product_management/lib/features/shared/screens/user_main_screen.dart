@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:animations/animations.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 import '../../products/presentation/providers/product_provider.dart';
 import '../../orders/presentation/providers/cart_provider.dart';
@@ -11,9 +12,12 @@ import '../../users/presentation/screens/edit_profile_screen.dart';
 import '../../wishlist/presentation/screens/wishlist_screen.dart';
 import '../../addresses/presentation/screens/user_address_list_screen.dart';
 import '../widgets/app_drawer.dart';
-import '../design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../../api/api_service.dart';
 import '../../users/data/models/user_model.dart';
+import '../widgets/floating_dock.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class UserMainScreen extends StatefulWidget {
   const UserMainScreen({super.key});
@@ -24,6 +28,8 @@ class UserMainScreen extends StatefulWidget {
 
 class _UserMainScreenState extends State<UserMainScreen> {
   int _currentIndex = 0;
+  final List<GlobalKey> _dockKeys = List.generate(4, (index) => GlobalKey());
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -47,7 +53,10 @@ class _UserMainScreenState extends State<UserMainScreen> {
 
   List<Widget> _buildScreens() {
     return [
-      const UserHomeScreen(),
+      UserHomeScreen(
+        cartKey: _dockKeys[1],
+        onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+      ),
       CartScreen(
         onGoShopping: () {
           setState(() {
@@ -69,7 +78,9 @@ class _UserMainScreenState extends State<UserMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      extendBody: true, // Allow body to extend behind the dock
       drawer: AppDrawer(
         currentIndex: _currentIndex,
         onItemSelected: (index) {
@@ -78,7 +89,47 @@ class _UserMainScreenState extends State<UserMainScreen> {
           });
         },
       ),
-      body: IndexedStack(index: _currentIndex, children: _buildScreens()),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: PageTransitionSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+                return FadeThroughTransition(
+                  animation: primaryAnimation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+              child: KeyedSubtree(
+                key: ValueKey<int>(_currentIndex),
+                child: _buildScreens()[_currentIndex],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: FloatingDock(
+              currentIndex: _currentIndex,
+              onItemSelected: (index) {
+                setState(() => _currentIndex = index);
+              },
+              icons: const [
+                Icons.home_rounded,
+                Icons.shopping_cart_rounded,
+                Icons.favorite_rounded,
+                Icons.person_rounded,
+              ],
+              labels: const ['Home', 'Cart', 'Likes', 'Profile'],
+              itemKeys: _dockKeys,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -92,7 +143,6 @@ class UserProfileTab extends StatefulWidget {
 
 class _UserProfileTabState extends State<UserProfileTab> {
   UserModel? _user;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -105,7 +155,6 @@ class _UserProfileTabState extends State<UserProfileTab> {
   Future<void> _fetchProfile() async {
     final authProvider = context.read<AuthProvider>();
     if (authProvider.userId != null) {
-      setState(() => _isLoading = true);
       try {
         final user = await ApiService().getUserById(authProvider.userId!);
         if (mounted) {
@@ -113,10 +162,6 @@ class _UserProfileTabState extends State<UserProfileTab> {
         }
       } catch (e) {
         debugPrint('Error fetching profile: $e');
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
       }
     }
   }
@@ -127,251 +172,248 @@ class _UserProfileTabState extends State<UserProfileTab> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Hồ sơ'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.menu_rounded, color: Colors.white),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _fetchProfile,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _fetchProfile,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              // Header Section containing Profile Info as requested
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(bottom: 32, top: 16),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // Modern App Bar with Blur Effect
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 280, // Taller header
+            backgroundColor: AppColors.background,
+            surfaceTintColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.primary, Color(0xFF6366F1)],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const SizedBox(height: 40), // Top spacing
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          width: 3,
-                        ),
+                        color: Colors.white.withValues(alpha: 0.2),
+                        border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: Colors.white,
                         backgroundImage: authProvider.userEmail != null
                             ? NetworkImage(
                                 'https://ui-avatars.com/api/?name=${_user?.name ?? authProvider.userEmail}&background=F0768B&color=fff',
                               )
                             : null,
                         child: authProvider.userEmail == null
-                            ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey,
-                              )
+                            ? const Icon(Icons.person, size: 50, color: AppColors.textLight)
                             : null,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    if (_isLoading && _user == null)
-                      const CircularProgressIndicator()
-                    else ...[
-                      Text(
-                        _user?.name ?? authProvider.userEmail ?? 'Khách hàng',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textMain,
+                    Text(
+                      _user?.name ?? authProvider.userEmail ?? 'Khách hàng',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (_user?.phone != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          _user!.phone!,
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      // Display extra info here as requested
-                      if (_user?.phone != null && _user!.phone!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.phone, size: 16, color: Colors.grey),
-                              const SizedBox(width: 4),
-                              Text(
-                                _user!.phone!,
-                                style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (_user?.email != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            _user!.email,
-                            style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                          ),
-                        ),
-                      if (_user?.address != null && _user!.address!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: Text(
-                            _user!.address!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey[500], fontSize: 14),
-                          ),
-                        ),
-                    ],
                   ],
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              // Menu Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                      _buildProfileItem(
-                        icon: Icons.history_rounded,
-                        color: Colors.blue,
-                        title: 'Lịch sử đơn hàng',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const UserOrderHistoryScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildProfileItem(
-                        icon: Icons.location_on_rounded,
-                        color: Colors.teal,
-                        title: 'Sổ địa chỉ',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const UserAddressListScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    const SizedBox(height: 16),
-                    _buildProfileItem(
-                      icon: Icons.edit_rounded,
-                      color: Colors.orange,
-                      title: 'Chỉnh sửa hồ sơ',
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const EditProfileScreen(),
-                          ),
-                        );
-                        _fetchProfile(); // Refresh after edit
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildProfileItem(
-                      icon: Icons.help_outline_rounded,
-                      color: Colors.purple,
-                      title: 'Trợ giúp & Hỗ trợ',
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 32),
-                    _buildProfileItem(
-                      icon: Icons.logout_rounded,
-                      color: AppColors.error,
-                      title: 'Đăng xuất',
-                      isDestructive: true,
-                      onTap: () {
-                        context.read<AuthProvider>().logout();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
+            ),
+            actions: [
+               IconButton(
+                 icon: const Icon(Icons.refresh, color: Colors.white),
+                 onPressed: _fetchProfile,
+               ),
             ],
           ),
-        ),
+
+          // Bento Grid Menu
+          SliverToBoxAdapter(
+             child: Padding(
+               padding: const EdgeInsets.all(20),
+               child: Column(
+                 children: [
+                   // Row 1: Profile & Address
+                   Row(
+                     children: [
+                       Expanded(
+                         child: _buildBentoItem(
+                           icon: Icons.person_outline_rounded,
+                           title: 'Hồ sơ',
+                           subtitle: 'Chỉnh sửa',
+                           color: const Color(0xFFF59E0B),
+                           onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                              );
+                              _fetchProfile();
+                           },
+                         ),
+                       ),
+                       const SizedBox(width: 16),
+                       Expanded(
+                         child: _buildBentoItem(
+                           icon: Icons.location_on_rounded,
+                           title: 'Địa chỉ',
+                           subtitle: 'Quản lý',
+                           color: const Color(0xFF10B981),
+                           onTap: () => Navigator.push(
+                             context,
+                             MaterialPageRoute(builder: (_) => const UserAddressListScreen()),
+                           ),
+                         ),
+                       ),
+                     ],
+                   ),
+                   const SizedBox(height: 16),
+
+                   // Row 2: History & Help
+                   Row(
+                     children: [
+                       Expanded(
+                         child: _buildBentoItem(
+                           icon: Icons.history_rounded,
+                           title: 'Lịch sử', // Shortened title for better fit
+                           subtitle: 'Đơn hàng',
+                           color: const Color(0xFF3B82F6),
+                           onTap: () => Navigator.push(
+                             context,
+                             MaterialPageRoute(builder: (_) => const UserOrderHistoryScreen()),
+                           ),
+                         ),
+                       ),
+                       const SizedBox(width: 16),
+                       Expanded(
+                         child: _buildBentoItem(
+                           icon: Icons.help_outline_rounded,
+                           title: 'Hỗ trợ',
+                           subtitle: 'Trung tâm',
+                           color: const Color(0xFF8B5CF6),
+                           onTap: () {},
+                         ),
+                       ),
+                     ],
+                   ),
+                   
+                   const SizedBox(height: 32),
+
+                   // Small Logout Button
+                   Center(
+                     child: TextButton.icon(
+                       onPressed: () {
+                         context.read<AuthProvider>().logout();
+                         Navigator.of(context).pushAndRemoveUntil(
+                           MaterialPageRoute(builder: (_) => const LoginScreen()),
+                           (route) => false,
+                         );
+                       },
+                       icon: const Icon(Icons.logout_rounded, size: 20),
+                       label: Text(
+                         'Đăng xuất',
+                         style: GoogleFonts.inter(
+                           fontWeight: FontWeight.w600,
+                           fontSize: 14,
+                         ),
+                       ),
+                       style: TextButton.styleFrom(
+                         foregroundColor: AppColors.error,
+                         backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(30),
+                         ),
+                       ),
+                     ),
+                   ),
+
+                   const SizedBox(height: 100), // Space for FloatingDock
+                 ],
+               ),
+             ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildProfileItem({
+  Widget _buildBentoItem({
     required IconData icon,
-    required Color color,
     required String title,
+    required String subtitle,
+    required Color color,
     required VoidCallback onTap,
-    bool isDestructive = false,
+    bool isLarge = false,
+    bool isDark = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 24),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: isLarge ? 140 : 160,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? color : Colors.white,
+          borderRadius: BorderRadius.circular(24), // Squircle
+          boxShadow: AppShadows.ambientShadow,
         ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: isDestructive ? AppColors.error : AppColors.textMain,
-          ),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios_rounded,
-          size: 18,
-          color: Colors.grey[400],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withValues(alpha: 0.2) : color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isDark ? Colors.white : color,
+                size: 24,
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : AppColors.textMain,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: isDark ? Colors.white.withValues(alpha: 0.8) : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

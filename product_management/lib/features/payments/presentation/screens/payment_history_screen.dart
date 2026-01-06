@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/payment_provider.dart';
 import '../../../../core/utils/price_formatter.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'payment_detail_screen.dart';
 
 class PaymentHistoryScreen extends StatefulWidget {

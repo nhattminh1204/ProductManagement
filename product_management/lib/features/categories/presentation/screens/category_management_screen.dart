@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/category_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'category_form_screen.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
@@ -42,8 +42,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     final categoryProvider = context.watch<CategoryProvider>();
 
     return Scaffold(
-      drawer: const AdminDrawer(),
+      drawer: const AdminDrawer(currentScreen: 'categories'),
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text('Quản lý danh mục'),
         centerTitle: true,
         backgroundColor: AppColors.primary,
@@ -88,28 +94,71 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               itemCount: categoryProvider.categories.length,
               itemBuilder: (context, index) {
                 final category = categoryProvider.categories[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                      child: Icon(Icons.category, color: AppColors.primary),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.category, color: AppColors.primary, size: 24),
+                        ),
+                      ],
                     ),
                     title: Text(
                       category.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    subtitle: Text('ID: ${category.id}'),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text('ID: ${category.id}', style: TextStyle(color: Colors.grey[500])),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: category.status == 'active' 
-                                ? Colors.green[100] 
-                                : Colors.red[100],
-                            borderRadius: BorderRadius.circular(12),
+                                ? Colors.green.withValues(alpha: 0.1) 
+                                : Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             category.status == 'active' ? 'Hoạt động' : 'Tạm ẩn',
@@ -124,12 +173,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                         ),
                         const SizedBox(width: 8),
                         PopupMenuButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(Icons.more_vert, color: Colors.grey[600]),
                           itemBuilder: (context) => [
                             const PopupMenuItem(
                               value: 'edit',
                               child: Row(
                                 children: [
-                                  Icon(Icons.edit, size: 20),
+                                  Icon(Icons.edit_outlined, size: 20),
                                   SizedBox(width: 8),
                                   Text('Sửa'),
                                 ],
@@ -139,7 +190,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  Icon(Icons.delete, size: 20, color: Colors.red),
+                                  Icon(Icons.delete_outline, size: 20, color: Colors.red),
                                   SizedBox(width: 8),
                                   Text('Xóa', style: TextStyle(color: Colors.red)),
                                 ],

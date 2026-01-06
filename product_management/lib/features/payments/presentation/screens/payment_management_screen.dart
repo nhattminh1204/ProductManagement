@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/payment_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 
 class PaymentManagementScreen extends StatelessWidget {
   const PaymentManagementScreen({super.key});

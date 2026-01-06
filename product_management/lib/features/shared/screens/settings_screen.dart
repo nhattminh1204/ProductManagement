@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -47,4 +47,3 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
-

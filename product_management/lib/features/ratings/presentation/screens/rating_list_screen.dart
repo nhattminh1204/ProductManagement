@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:product_management/features/shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'package:provider/provider.dart';
 import '../providers/rating_provider.dart';
 

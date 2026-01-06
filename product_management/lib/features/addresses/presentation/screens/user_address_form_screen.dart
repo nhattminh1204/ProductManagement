@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/entities/user_address_entity.dart';
 import '../providers/user_address_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 class UserAddressFormScreen extends StatefulWidget {

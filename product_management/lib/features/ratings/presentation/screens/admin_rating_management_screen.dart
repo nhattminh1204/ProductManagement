@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:product_management/features/shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'package:product_management/features/shared/presentation/widgets/admin_drawer.dart';
 import 'package:provider/provider.dart';
 import '../providers/rating_provider.dart';
@@ -79,8 +79,14 @@ class _AdminRatingManagementScreenState
     final provider = context.watch<RatingProvider>();
 
     return Scaffold(
-      drawer: const AdminDrawer(),
+      drawer: const AdminDrawer(currentScreen: 'ratings'),
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text('Quản lý đánh giá'),
         centerTitle: true,
         backgroundColor: AppColors.primary,

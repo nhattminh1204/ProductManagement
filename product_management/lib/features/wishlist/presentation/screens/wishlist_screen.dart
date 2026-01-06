@@ -7,7 +7,7 @@ import '../../../shared/widgets/add_to_cart_animation.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../../products/presentation/screens/product_detail_screen.dart';
 import '../../../../core/utils/price_formatter.dart';
 

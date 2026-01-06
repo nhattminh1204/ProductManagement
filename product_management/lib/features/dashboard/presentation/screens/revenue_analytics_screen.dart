@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../providers/dashboard_provider.dart';
 import '../../../../core/utils/price_formatter.dart';
-import '../../../shared/design_system.dart';
 
 class RevenueAnalyticsScreen extends StatefulWidget {
   const RevenueAnalyticsScreen({super.key});
@@ -46,125 +46,119 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
       body: dashboardProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : dashboardProvider.error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: ${dashboardProvider.error}'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          context
-                              .read<DashboardProvider>()
-                              .fetchRevenueByPeriod(_selectedPeriod);
-                        },
-                        child: const Text('Retry'),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${dashboardProvider.error}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<DashboardProvider>().fetchRevenueByPeriod(
+                        _selectedPeriod,
+                      );
+                    },
+                    child: const Text('Retry'),
                   ),
-                )
-              : revenue.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.bar_chart, size: 80, color: Colors.grey[300]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No revenue data',
-                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: () async {
-                        await context
-                            .read<DashboardProvider>()
-                            .fetchRevenueByPeriod(_selectedPeriod);
-                      },
-                      child: SingleChildScrollView(
+                ],
+              ),
+            )
+          : revenue.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.bar_chart, size: 80, color: Colors.grey[300]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No revenue data',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: () async {
+                await context.read<DashboardProvider>().fetchRevenueByPeriod(
+                  _selectedPeriod,
+                );
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Period Selector
+                    _buildPeriodSelector(),
+                    const SizedBox(height: 24),
+                    // Summary Cards
+                    _buildSummaryCards(revenue),
+                    const SizedBox(height: 24),
+                    // Chart
+                    Card(
+                      child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Period Selector
-                            _buildPeriodSelector(),
-                            const SizedBox(height: 24),
-                            // Summary Cards
-                            _buildSummaryCards(revenue),
-                            const SizedBox(height: 24),
-                            // Chart
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Revenue Trend',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    SizedBox(
-                                      height: 300,
-                                      child: _buildLineChart(revenue),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Revenue List
-                            const Text(
-                              'Revenue Details',
-                              style: TextStyle(
+                            Text(
+                              'Revenue Trend',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            ...revenue.entries.map((entry) => Card(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  child: ListTile(
-                                    title: Text(entry.key),
-                                    trailing: Text(
-                                      entry.value.formatPriceWithCurrency(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                )),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 300,
+                              child: _buildLineChart(revenue),
+                            ),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    // Revenue List
+                    const Text(
+                      'Revenue Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...revenue.entries.map(
+                      (entry) => Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          title: Text(entry.key),
+                          trailing: Text(
+                            entry.value.formatPriceWithCurrency(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
   Widget _buildPeriodSelector() {
     return Row(
       children: [
-        Expanded(
-          child: _buildPeriodButton('day', 'Day'),
-        ),
+        Expanded(child: _buildPeriodButton('day', 'Day')),
         const SizedBox(width: 8),
-        Expanded(
-          child: _buildPeriodButton('week', 'Week'),
-        ),
+        Expanded(child: _buildPeriodButton('week', 'Week')),
         const SizedBox(width: 8),
-        Expanded(
-          child: _buildPeriodButton('month', 'Month'),
-        ),
+        Expanded(child: _buildPeriodButton('month', 'Month')),
         const SizedBox(width: 8),
-        Expanded(
-          child: _buildPeriodButton('year', 'Year'),
-        ),
+        Expanded(child: _buildPeriodButton('year', 'Year')),
       ],
     );
   }
@@ -174,9 +168,7 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
     return ElevatedButton(
       onPressed: () => _onPeriodChanged(period),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? AppColors.primary
-            : Colors.grey[200],
+        backgroundColor: isSelected ? AppColors.primary : Colors.grey[200],
         foregroundColor: isSelected ? Colors.white : Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),
@@ -224,7 +216,11 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
   }
 
   Widget _buildSummaryCard(
-      String title, String value, IconData icon, Color color) {
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -320,4 +316,3 @@ class _RevenueAnalyticsScreenState extends State<RevenueAnalyticsScreen> {
     );
   }
 }
-

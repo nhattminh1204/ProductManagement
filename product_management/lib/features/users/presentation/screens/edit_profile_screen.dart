@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../api/api_service.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../data/models/user_model.dart';
 import 'package:intl/intl.dart';
 import 'change_password_screen.dart';

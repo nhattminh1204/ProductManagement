@@ -6,7 +6,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../wishlist/presentation/providers/wishlist_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import '../../../shared/widgets/love_button.dart';
 import '../../../orders/presentation/screens/cart_screen.dart';
 import '../../../ratings/presentation/providers/rating_provider.dart';
@@ -55,153 +55,122 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       length: tabs.length,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('Chi tiết sản phẩm'),
-          centerTitle: true,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
         body: CustomScrollView(
           slivers: [
-             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 400,
-                child: Stack(
+            SliverAppBar(
+              expandedHeight: 400,
+              pinned: true,
+              stretch: true,
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: AppColors.primary),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
                   fit: StackFit.expand,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (widget.product.image != null &&
-                            widget.product.image!.isNotEmpty) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                              backgroundColor: Colors.transparent,
-                              insetPadding: EdgeInsets.zero,
-                              child: Stack(
-                                children: [
-                                  InteractiveViewer(
-                                    child: Image.network(
-                                      widget.product.image!,
-                                      fit: BoxFit.contain,
-                                      height: MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width,
+                    Hero(
+                      tag: 'product_image_${widget.product.id}',
+                      child: GestureDetector(
+                        onTap: () {
+                          if (widget.product.image != null && widget.product.image!.isNotEmpty) {
+                             // Keep existing dialog logic if needed, or just allow Hero transition back
+                             showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.transparent,
+                                insetPadding: EdgeInsets.zero,
+                                child: Stack(
+                                  children: [
+                                    InteractiveViewer(
+                                      child: Image.network(
+                                        widget.product.image!,
+                                        fit: BoxFit.contain,
+                                        height: MediaQuery.of(context).size.height,
+                                        width: MediaQuery.of(context).size.width,
+                                      ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    top: 40,
-                                    right: 20,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.close,
-                                          color: Colors.white, size: 30),
-                                      onPressed: () => Navigator.pop(context),
+                                    Positioned(
+                                      top: 40,
+                                      right: 20,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                      key: _imageKey,
-                      child: widget.product.image != null &&
-                              widget.product.image!.isNotEmpty
-                          ? Image.network(
-                              widget.product.image!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 64,
-                                  color: Colors.grey,
+                                  ],
                                 ),
                               ),
-                            )
-                          : const Center(
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: 64,
-                                color: Colors.grey,
-                              ),
-                            ),
-                    ),
-                    ),
-                    // Gradient overlay for better text visibility (optional, but good for white icons)
-                    
-                    // Wishlist Button
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Consumer2<WishlistProvider, AuthProvider>(
-                        builder: (context, wishlistProvider, authProvider, child) {
-                          final isWishlisted =
-                              wishlistProvider.isInWishlist(widget.product.id);
-                          return Container(
-                            height: 48,
-                            width: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                )
-                              ],
-                            ),
-                            child: Center(
-                              child: LoveButton(
-                                isLiked: isWishlisted,
-                                size: 28,
-                                onTap: () async {
-                                  if (!authProvider.isAuthenticated ||
-                                      authProvider.userId == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text(
-                                            'Vui lòng đăng nhập để thêm vào danh sách yêu thích'),
-                                        backgroundColor: AppColors.error,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        width: 300,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  try {
-                                    if (isWishlisted) {
-                                      await wishlistProvider.removeFromWishlist(
-                                          authProvider.userId!,
-                                          widget.product.id);
-                                    } else {
-                                      await wishlistProvider.addToWishlist(
-                                          authProvider.userId!,
-                                          widget.product.id);
-                                    }
-                                  } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Lỗi: ${e.toString()}'),
-                                        backgroundColor: AppColors.error,
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
-                          );
+                            );
+                          }
                         },
+                        child: widget.product.image != null && widget.product.image!.isNotEmpty
+                            ? Image.network(
+                                widget.product.image!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey[100],
+                                  child: const Center(
+                                    child: Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                color: Colors.grey[100],
+                                child: const Center(
+                                  child: Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                                ),
+                              ),
+                      ),
+                    ),
+                    // Gradient Overlay to ensure back button visibility
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 100,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withOpacity(0.8),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+              actions: [
+                 Consumer2<WishlistProvider, AuthProvider>(
+                    builder: (context, wishlistProvider, authProvider, child) {
+                      final isWishlisted = wishlistProvider.isInWishlist(widget.product.id);
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: LoveButton(
+                          isLiked: isWishlisted,
+                          size: 24,
+                          onTap: () async {
+                              if (!authProvider.isAuthenticated || authProvider.userId == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Vui lòng đăng nhập')),
+                                );
+                                return;
+                              }
+                              if (isWishlisted) {
+                                await wishlistProvider.removeFromWishlist(authProvider.userId!, widget.product.id);
+                              } else {
+                                await wishlistProvider.addToWishlist(authProvider.userId!, widget.product.id);
+                              }
+                          },
+                        ),
+                      );
+                    },
+                 ),
+              ],
             ),
 
             // Tabs pinned below the image

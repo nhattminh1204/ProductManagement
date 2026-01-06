@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 
 class UserFormScreen extends StatefulWidget {
   final User? user;
@@ -83,117 +83,240 @@ class _UserFormScreenState extends State<UserFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Tên',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+             Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromRGBO(0, 0, 0, 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập tên';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                       children: [
+                        Icon(Icons.person, color: AppColors.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Thông tin cá nhân',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Tên hiển thị',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        prefixIcon: const Icon(Icons.person_outline),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập tên';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        prefixIcon: const Icon(Icons.email_outlined),
+                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                       filled: true,
+                       fillColor: Colors.grey[50],
+                      ),
+                      enabled: false,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Số điện thoại',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        prefixIcon: const Icon(Icons.phone_outlined),
+                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
                 ),
-                enabled: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập Email';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Số điện thoại',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+             ),
+             const SizedBox(height: 16),
+
+             Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromRGBO(0, 0, 0, 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
-                keyboardType: TextInputType.phone,
-              ),
+                padding: const EdgeInsets.all(16),
+                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                       children: [
+                        Icon(Icons.admin_panel_settings, color: AppColors.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Phân quyền & Trạng thái',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Role
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                               const Text(
+                                  'Vai trò',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: SegmentedButton<String>(
+                                  segments: const [
+                                    ButtonSegment(
+                                      value: 'user',
+                                      icon: Icon(Icons.person_outline, size: 18),
+                                      label: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text('User', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                    ButtonSegment(
+                                      value: 'admin',
+                                      icon: Icon(Icons.admin_panel_settings_outlined, size: 18),
+                                      label: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text('Admin', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                  ],
+                                  selected: {_role},
+                                  onSelectionChanged: (Set<String> newSelection) {
+                                    setState(() {
+                                      _role = newSelection.first;
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Status
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Trạng thái',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: SegmentedButton<String>(
+                                  segments: const [
+                                    ButtonSegment(
+                                      value: 'active',
+                                      icon: Icon(Icons.check_circle_outline, size: 18),
+                                      label: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text('Bật', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                    ButtonSegment(
+                                      value: 'inactive',
+                                      icon: Icon(Icons.block_outlined, size: 18),
+                                      label: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text('Tắt', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                  ],
+                                  selected: {_status},
+                                  onSelectionChanged: (Set<String> newSelection) {
+                                    setState(() {
+                                      _status = newSelection.first;
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                     padding: WidgetStateProperty.all(EdgeInsets.zero),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                 ),
+             ),
+             
               const SizedBox(height: 24),
-              const Text(
-                'Vai trò',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(
-                    value: 'user',
-                    label: Text('Người dùng'),
-                    icon: Icon(Icons.person),
-                  ),
-                  ButtonSegment(
-                    value: 'admin',
-                    label: Text('Quản trị viên'),
-                    icon: Icon(Icons.admin_panel_settings),
-                  ),
-                ],
-                selected: {_role},
-                onSelectionChanged: (Set<String> newSelection) {
-                  setState(() {
-                    _role = newSelection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Trạng thái',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(
-                    value: 'active',
-                    label: Text('Hoạt động'),
-                    icon: Icon(Icons.check_circle),
-                  ),
-                  ButtonSegment(
-                    value: 'inactive',
-                    label: Text('Bị khóa'),
-                    icon: Icon(Icons.cancel),
-                  ),
-                ],
-                selected: {_status},
-                onSelectionChanged: (Set<String> newSelection) {
-                  setState(() {
-                    _status = newSelection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 32),
               Consumer<UserProvider>(
                 builder: (context, provider, _) {
-                  return FilledButton(
-                    onPressed: provider.isLoading ? null : _handleSubmit,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                  return SizedBox(
+                     height: 50,
+                     child: FilledButton(
+                      onPressed: provider.isLoading ? null : _handleSubmit,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: provider.isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text(
+                              'Cập nhật thông tin',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
                     ),
-                    child: provider.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text(
-                            'Cập nhật',
-                            style: TextStyle(fontSize: 16),
-                          ),
                   );
                 },
               ),

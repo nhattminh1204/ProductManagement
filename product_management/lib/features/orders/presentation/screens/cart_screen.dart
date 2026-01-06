@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../providers/cart_provider.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {

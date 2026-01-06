@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/dashboard_provider.dart';
-import '../../../shared/design_system.dart';
 
 class OrderStatisticsScreen extends StatefulWidget {
   const OrderStatisticsScreen({super.key});
@@ -52,139 +52,139 @@ class _OrderStatisticsScreenState extends State<OrderStatisticsScreen> {
       body: dashboardProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : dashboardProvider.error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Error: ${dashboardProvider.error}'),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          context
-                              .read<DashboardProvider>()
-                              .fetchOrderStatsByStatus();
-                        },
-                        child: const Text('Retry'),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${dashboardProvider.error}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context
+                          .read<DashboardProvider>()
+                          .fetchOrderStatsByStatus();
+                    },
+                    child: const Text('Retry'),
                   ),
-                )
-              : orderStats.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.pie_chart, size: 80, color: Colors.grey[300]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No order statistics',
-                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: () async {
-                        await context
-                            .read<DashboardProvider>()
-                            .fetchOrderStatsByStatus();
-                      },
-                      child: SingleChildScrollView(
+                ],
+              ),
+            )
+          : orderStats.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.pie_chart, size: 80, color: Colors.grey[300]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No order statistics',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: () async {
+                await context
+                    .read<DashboardProvider>()
+                    .fetchOrderStatsByStatus();
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Summary Card
+                    _buildSummaryCard(orderStats),
+                    const SizedBox(height: 24),
+                    // Pie Chart
+                    Card(
+                      child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Summary Card
-                            _buildSummaryCard(orderStats),
-                            const SizedBox(height: 24),
-                            // Pie Chart
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Order Distribution',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    SizedBox(
-                                      height: 300,
-                                      child: _buildPieChart(orderStats),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Bar Chart
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Orders by Status',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    SizedBox(
-                                      height: 300,
-                                      child: _buildBarChart(orderStats),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Status Details
                             const Text(
-                              'Status Details',
+                              'Order Distribution',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            ...orderStats.entries.map((entry) => Card(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  child: ListTile(
-                                    leading: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: _getStatusColor(entry.key),
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      entry.key.toUpperCase(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    trailing: Text(
-                                      '${entry.value} orders',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                )),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 300,
+                              child: _buildPieChart(orderStats),
+                            ),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    // Bar Chart
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Orders by Status',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 300,
+                              child: _buildBarChart(orderStats),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Status Details
+                    const Text(
+                      'Status Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...orderStats.entries.map(
+                      (entry) => Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(entry.key),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          title: Text(
+                            entry.key.toUpperCase(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          trailing: Text(
+                            '${entry.value} orders',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -327,5 +327,3 @@ class _OrderStatisticsScreenState extends State<OrderStatisticsScreen> {
     );
   }
 }
-
-

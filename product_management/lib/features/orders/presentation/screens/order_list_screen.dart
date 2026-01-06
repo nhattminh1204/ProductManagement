@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:product_management/features/shared/design_system.dart';
-import 'package:product_management/features/shared/presentation/widgets/admin_drawer.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
+
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -10,8 +10,11 @@ import '../../../auth/presentation/screens/login_screen.dart';
 import 'order_detail_screen.dart';
 import '../widgets/order_filter_bottom_sheet.dart';
 
+
 class OrderListScreen extends StatefulWidget {
-  const OrderListScreen({super.key});
+  final VoidCallback? onOpenDrawer;
+
+  const OrderListScreen({super.key, this.onOpenDrawer});
 
   @override
   State<OrderListScreen> createState() => _OrderListScreenState();
@@ -127,8 +130,13 @@ class _OrderListScreenState extends State<OrderListScreen> {
     final orderProvider = context.watch<OrderProvider>();
 
     return Scaffold(
-      drawer: const AdminDrawer(),
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => widget.onOpenDrawer?.call(),
+          ),
+        ),
         title: const Text('Quản lý đơn hàng'),
         centerTitle: true,
         backgroundColor: AppColors.primary,
@@ -182,25 +190,69 @@ class _OrderListScreenState extends State<OrderListScreen> {
                 final order = orderProvider.orders[index];
                 final isPending = order.status.toLowerCase() == 'pending';
                 
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Đơn #${order.orderCode}',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '#${order.orderCode}',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      DateFormat('dd/MM/yyyy HH:mm').format(order.createdDate),
+                                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
                                 color: _getStatusColor(order.status).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 _getStatusText(order.status),
@@ -213,17 +265,41 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text('Khách hàng: ${order.customerName}'),
-                        Text(
-                          'Ngày đặt: ${DateFormat('dd/MM/yyyy HH:mm').format(order.createdDate)}',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded( // Customer info
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 16,
+                                    backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                                    child: const Icon(Icons.person, size: 16, color: Colors.blue),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      order.customerName, 
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              order.totalPrice.formatPriceWithCurrency(),
+                               style: const TextStyle(
+                                 fontWeight: FontWeight.w900, 
+                                 color: AppColors.primary,
+                                 fontSize: 16,
+                                ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tổng tiền: ${order.totalPrice.formatPriceWithCurrency()}',
-                           style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-                        ),
+                        
+                        const SizedBox(height: 16),
+                        const Divider(height: 1),
                         const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -237,6 +313,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                   ),
                                 );
                               },
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.grey[700],
+                              ),
                               child: const Text('Chi tiết'),
                             ),
                             if (isPending) ...[
@@ -247,6 +326,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                 label: const Text('Hủy', style: TextStyle(color: Colors.red)),
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(color: Colors.red),
+                                  foregroundColor: Colors.red,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -254,6 +335,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                 onPressed: () => _updateStatus(order.id, 'confirmed'),
                                 icon: const Icon(Icons.check, size: 16),
                                 label: const Text('Duyệt'),
+                                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16)),
                               ),
                             ] else if (order.status.toLowerCase() == 'confirmed' || order.status.toLowerCase() == 'paid') ...[
                               const SizedBox(width: 8),
@@ -261,6 +343,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                                 onPressed: () => _updateStatus(order.id, 'shipped'),
                                 icon: const Icon(Icons.local_shipping, size: 16),
                                 label: const Text('Giao hàng'),
+                                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16)),
                               ),
                             ],
                           ],

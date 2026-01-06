@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:product_management/features/products/presentation/screens/user_home_screen.dart';
-import '../../../shared/design_system.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'user_order_history_screen.dart';
 
 class CheckoutSuccessScreen extends StatelessWidget {

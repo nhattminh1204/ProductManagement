@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:product_management/product_management/presentation/design_system.dart';
 import 'package:provider/provider.dart';
 import '../../products/presentation/screens/user_product_list_screen.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 import '../../orders/presentation/screens/user_order_history_screen.dart';
 import '../../payments/presentation/screens/payment_history_screen.dart';
-import '../design_system.dart';
 
 class AppDrawer extends StatelessWidget {
   final int? currentIndex;
@@ -18,36 +19,115 @@ class AppDrawer extends StatelessWidget {
     final authProvider = context.watch<AuthProvider>();
 
     return Drawer(
+      backgroundColor: AppColors.surface,
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
       child: Column(
         children: [
-          // Drawer Header
-          UserAccountsDrawerHeader(
-            accountName: Text(
-              authProvider.isAdmin ? 'Quản trị viên' : 'Khách hàng',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+          // Custom Header
+          Container(
+            padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+              ),
             ),
-            accountEmail: Text(authProvider.userEmail ?? 'Chưa có email'),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, color: AppColors.primary, size: 40),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, Color(0xFF6366F1)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: authProvider.userEmail != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              'https://ui-avatars.com/api/?name=${authProvider.userEmail}&background=fff&color=4F46E5',
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(Icons.person, color: AppColors.primary),
+                            ),
+                          )
+                        : const Icon(Icons.person, color: AppColors.primary),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        authProvider.isAdmin ? 'Quản trị viên' : 'Khách hàng',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.textMain,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        authProvider.userEmail ?? 'Chưa đăng nhập',
+                        style: GoogleFonts.inter(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            decoration: const BoxDecoration(color: AppColors.primary),
           ),
 
           // Menu Items
           Expanded(
             child: ListView(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               children: [
+                _buildSectionHeader('MENU'),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.home_outlined,
+                  context,
+                  icon: Icons.home_rounded,
                   title: 'Trang chủ',
-                  index: 0,
+                  isActive: currentIndex == 0,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (onItemSelected != null) onItemSelected!(0);
+                  },
                 ),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.inventory_2_outlined,
+                  context,
+                  icon: Icons.inventory_2_rounded,
                   title: 'Sản phẩm',
                   onTap: () {
                     Navigator.pop(context);
@@ -60,30 +140,44 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.shopping_bag_outlined,
+                  context,
+                  icon: Icons.shopping_cart_rounded,
                   title: 'Giỏ hàng',
-                  index: 1,
+                  isActive: currentIndex == 1,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (onItemSelected != null) onItemSelected!(1);
+                  },
                 ),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.favorite_border_rounded,
+                  context,
+                  icon: Icons.favorite_rounded,
                   title: 'Yêu thích',
-                  index: 2,
+                  isActive: currentIndex == 2,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (onItemSelected != null) onItemSelected!(2);
+                  },
                 ),
+
+                const SizedBox(height: 24),
+                _buildSectionHeader('TÀI KHOẢN'),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.person_outline_rounded,
+                  context,
+                  icon: Icons.person_rounded,
                   title: 'Hồ sơ cá nhân',
-                  index: 3,
+                  isActive: currentIndex == 3,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (onItemSelected != null) onItemSelected!(3);
+                  },
                 ),
-                const Divider(),
                 _buildDrawerItem(
-                  context: context,
+                  context,
                   icon: Icons.history_rounded,
                   title: 'Lịch sử đơn hàng',
                   onTap: () {
-                    Navigator.pop(context); // Close drawer
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -93,11 +187,11 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 _buildDrawerItem(
-                  context: context,
-                  icon: Icons.payment,
+                  context,
+                  icon: Icons.payment_rounded,
                   title: 'Lịch sử thanh toán',
                   onTap: () {
-                    Navigator.pop(context); // Close drawer
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -106,21 +200,34 @@ class AppDrawer extends StatelessWidget {
                     );
                   },
                 ),
-                const Divider(),
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.logout_rounded,
-                  title: 'Đăng xuất',
-                  onTap: () {
-                    Navigator.pop(context); // Close drawer
-                    context.read<AuthProvider>().logout();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  },
-                ),
               ],
+            ),
+          ),
+
+          // Footer
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: _buildDrawerItem(
+              context,
+              icon: Icons.logout_rounded,
+              title: 'Đăng xuất',
+              onTap: () {
+                Navigator.pop(context);
+                context.read<AuthProvider>().logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+              isDanger: true,
             ),
           ),
         ],
@@ -128,37 +235,72 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    int? index,
-    VoidCallback? onTap,
-  }) {
-    final isSelected =
-        currentIndex != null && index != null && currentIndex == index;
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? AppColors.primary : Colors.grey[700],
-      ),
-      title: Text(
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, bottom: 8),
+      child: Text(
         title,
-        style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? AppColors.primary : Colors.black87,
+        style: GoogleFonts.inter(
+          color: AppColors.textLight,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
         ),
       ),
-      selected: isSelected,
-      onTap:
-          onTap ??
-          () {
-            Navigator.pop(context); // Close drawer
-            if (onItemSelected != null && index != null) {
-              onItemSelected!(index);
-            }
-          },
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isActive = false,
+    bool isDanger = false,
+  }) {
+    final color = isDanger
+        ? AppColors.error
+        : (isActive ? AppColors.primary : AppColors.textMain);
+    final bgColor = isActive
+        ? AppColors.primary.withValues(alpha: 0.08)
+        : Colors.transparent;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        dense: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: Icon(
+          icon,
+          color: isDanger
+              ? AppColors.error
+              : (isActive ? AppColors.primary : AppColors.textSecondary),
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            color: color,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+        trailing: isActive
+            ? Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              )
+            : null,
+      ),
     );
   }
 }
